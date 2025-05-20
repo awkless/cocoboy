@@ -1,0 +1,102 @@
+# SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
+# SPDX-License-Identifier: CC0-1.0
+
+name: COCOBOY Quality Check
+
+on: [push, pull_request]
+
+jobs:
+  reuse:
+    name: REUSE 3.3 compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: REUSE compliance check
+        uses: fsfe/reuse-action@v5
+
+  build:
+    name: "${{ matrix.config.name }}"
+    runs-on: "${{ matrix.config.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {
+              name: "Ubuntu Latest GCC",
+              os: ubuntu-latest,
+              artifact: "cocoboy_linux_checks_${{github.sha}}.tar.xz",
+              build-type: Debug,
+              conan-build: "conan-debug",
+              test-dir: build/Debug,
+              sudo: True
+            }
+          - {
+              name: "MacOS Latest Clang",
+              os: macos-latest,
+              artifact: "cocoboy_macos_checks_${{github.sha}}.tar.xz",
+              build-type: Debug,
+              conan-build: "conan-debug",
+              test-dir: build/Debug,
+              sudo: True
+            }
+          - {
+              name: "Windows Latest MSVC",
+              os: windows-latest,
+              artifact: "cocoboy_windows_checks_${{github.sha}}.tar.xz",
+              build-type: Debug,
+              conan-build: "conan-debug",
+              test-dir: build,
+              sudo: False
+            }
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup CPP
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: "${{ matrix.compiler }}"
+          vcvarsall: "${{ contains(matrix.os, 'windows') }}"
+          cmake: true
+          ninja: true
+          vcpkg: false
+          cppcheck: true
+          clangtidy: true
+          conan: "2.16.0"
+
+      - name: Setup Conan Profile
+        run: conan profile detect --force
+
+      - name: Manage Dependencies
+        run: >
+          conan install .
+          --build=missing
+          -s build_type=${{ matrix.config.build-type }}
+          -c tools.cmake.cmaketoolchain:generator=Ninja
+          -c tools.system.package_manager:mode=install
+          -c tools.system.package_manager:sudo=${{ matrix.config.sudo }}
+          -s compiler.cppstd=17
+
+      - name: Configure CMake
+        run: >
+          cmake -G Ninja --preset ${{ matrix.config.conan-build }}
+          -DWARNINGS_AS_ERRORS=ON
+          -DENABLE_TESTS=ON
+          -DENABLE_CLANG_TIDY=ON
+          -DENABLE_CPPCHECK=ON
+
+      - name: Build COCOBOY
+        run: cmake --build --preset ${{ matrix.config.conan-build }}
+
+      - name: Run Tests
+        run: >
+          ctest --test-dir ${{ matrix.config.test-dir }}
+          -C ${{ matrix.config.build-type }}
+
+      - name: Packup Build
+        run: cmake -E tar cJfv ${{ matrix.config.artifact }} build
+
+      - name: Upload Build
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./${{ matrix.config.artifact }}
+          name: "${{ matrix.config.artifact }}"
