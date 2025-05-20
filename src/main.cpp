@@ -3,9 +3,9 @@
 
 #include "config.hpp"
 
-#include <SDL.h>
-#include <imgui/backends/imgui_impl_sdl2.h>
-#include <imgui/backends/imgui_impl_sdlrenderer2.h>
+#include <SDL3/SDL.h>
+#include <imgui/backends/imgui_impl_sdl3.h>
+#include <imgui/backends/imgui_impl_sdlrenderer3.h>
 #include <imgui.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
@@ -41,31 +41,30 @@ try {
 
     constexpr int winWidth = 600;
     constexpr int winHeight = 400;
-    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     SDL_Window* window =
-        SDL_CreateWindow("cc8emu", SDL_WINDOWPOS_UNDEFINED,
-                         SDL_WINDOWPOS_UNDEFINED, winWidth, winHeight, 0);
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+        SDL_CreateWindow("cocoboy", winWidth, winHeight, SDL_WINDOW_OPENGL);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, nullptr);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& gio = ImGui::GetIO();
     gio.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
-    ImGui_ImplSDLRenderer2_Init(renderer);
+    ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer3_Init(renderer);
 
     bool running = true;
     while (running) {
         SDL_Event event;
         while (SDL_PollEvent(&event) == 1) {
-            ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_QUIT) {
+            ImGui_ImplSDL3_ProcessEvent(&event);
+            if (event.type == SDL_EVENT_QUIT) {
                 running = false;
             }
         }
 
-        ImGui_ImplSDLRenderer2_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
+        ImGui_ImplSDLRenderer3_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
 
         bool some_panel = true;
@@ -76,12 +75,12 @@ try {
         ImGui::Render();
         SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);  // NOLINT
         SDL_RenderClear(renderer);
-        ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+        ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
         SDL_RenderPresent(renderer);
     }
 
-    ImGui_ImplSDLRenderer2_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDLRenderer3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 
     SDL_DestroyRenderer(renderer);

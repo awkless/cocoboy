@@ -110,7 +110,7 @@ target_compile_options(warnings INTERFACE ${project_warnings})
 add_library(cocoboy::warnings ALIAS warnings)
 
 # Obtain dependencies...
-find_package(SDL2 REQUIRED)
+find_package(SDL3 REQUIRED)
 find_package(cxxopts REQUIRED)
 find_package(fmt REQUIRED)
 find_package(imgui REQUIRED)
@@ -125,16 +125,15 @@ find_package(spdlog REQUIRED)
 add_library(backends STATIC)
 target_sources(
   backends
-  PUBLIC "${CMAKE_BINARY_DIR}/src/imgui/backends/imgui_impl_sdl2.h"
-         "${CMAKE_BINARY_DIR}/src/imgui/backends/imgui_impl_sdlrenderer2.h"
-  PRIVATE "${CMAKE_BINARY_DIR}/src/imgui/backends/imgui_impl_sdl2.cpp"
-          "${CMAKE_BINARY_DIR}/src/imgui/backends/imgui_impl_sdlrenderer2.cpp")
+  PUBLIC "${CMAKE_BINARY_DIR}/src/imgui/backends/imgui_impl_sdl3.h"
+         "${CMAKE_BINARY_DIR}/src/imgui/backends/imgui_impl_sdlrenderer3.h"
+  PRIVATE "${CMAKE_BINARY_DIR}/src/imgui/backends/imgui_impl_sdl3.cpp"
+          "${CMAKE_BINARY_DIR}/src/imgui/backends/imgui_impl_sdlrenderer3.cpp")
 
 target_link_libraries(
   backends
   PRIVATE cocoboy::options
-          SDL2::SDL2
-          SDL2::SDL2main
+          SDL3::SDL3
           imgui::imgui)
 add_library(imgui::backends ALIAS backends)
 target_include_directories(backends PUBLIC "${CMAKE_BINARY_DIR}/src")
@@ -146,8 +145,7 @@ target_link_libraries(
   INTERFACE cocoboy::options
             cocoboy::warnings
             spdlog::spdlog
-            SDL2::SDL2
-            SDL2::SDL2main
+            SDL3::SDL3
             cxxopts::cxxopts
             fmt::fmt
             imgui::imgui
