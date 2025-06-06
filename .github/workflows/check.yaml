@@ -1,19 +1,11 @@
 # SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
 # SPDX-License-Identifier: CC0-1.0
 
-name: COCOBOY Quality Check
+name: Quality Check
 
 on: [push, pull_request]
 
 jobs:
-  reuse:
-    name: REUSE 3.3 compliance
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: REUSE compliance check
-        uses: fsfe/reuse-action@v5
-
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
@@ -36,7 +28,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Cache
+      - name: Cache Build
         uses: actions/cache@v4
         with:
           path: |
