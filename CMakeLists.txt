@@ -232,9 +232,9 @@ add_subdirectory(src)
 
 # Build testing suite...
 if(ENABLE_TESTS)
-  find_package(GTest REQUIRED)
+  find_package(Catch2 REQUIRED)
   include(CTest)
-  include(GoogleTest)
+  include(Catch)
 
   enable_testing()
   add_subdirectory(tests)

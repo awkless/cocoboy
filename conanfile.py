@@ -12,11 +12,11 @@ class ChocoChip8(ConanFile):
 
 	def requirements(self):
 		self.requires("cxxopts/3.2.0")
-		self.requires("fmt/11.0.2")
-		self.requires("gtest/1.16.0")
+		self.requires("fmt/11.2.0")
+		self.requires("catch2/3.8.1")
 		self.requires("imgui/1.91.8")
 		self.requires("sdl/3.2.6")
-		self.requires("spdlog/1.15.0")
+		self.requires("spdlog/1.15.3")
 
 	def generate(self):
 		# INVARIANT: SDL backends for imgui are properly copied into
