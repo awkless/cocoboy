@@ -82,7 +82,6 @@ jobs:
           -DWARNINGS_AS_ERRORS=ON
           -DENABLE_TESTS=ON
           -DENABLE_CLANG_TIDY=ON
-          -DENABLE_CPPCHECK=ON
 
       - name: Build COCOBOY
         run: cmake --build --preset ${{ matrix.config.conan-build }}

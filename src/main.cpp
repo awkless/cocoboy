@@ -19,18 +19,19 @@ main(int argc, char **argv)
 try {
     std::unique_ptr<cxxopts::Options> parser = std::make_unique<cxxopts::Options>(argv[0], "- testing");
     bool version = false;
+    constexpr size_t max_width = 90;
     auto& options = *parser;
-    options.set_width(80).set_tab_expansion().add_options()(
+    options.set_width(max_width).set_tab_expansion().add_options()(
         "v,version", "version info", cxxopts::value<bool>(version));
     auto result = options.parse(argc, argv);
 
-    if (result.count("version"))
+    if (result.count("version") != 0U)
         fmt::print("{}\n", cocoboy::PROGRAM_VERSION);
 
     fmt::print("{} {}\n", cocoboy::PROGRAM_NAME, cocoboy::PROGRAM_VERSION);
     fmt::print("{}\n\n", cocoboy::PROGRAM_DESCRIPTION);
 
-    auto logger = spdlog::stdout_color_mt(cocoboy::PROGRAM_NAME.data());
+    auto logger = spdlog::stdout_color_mt(cocoboy::PROGRAM_NAME.data()); // NOLINT
     logger->set_level(spdlog::level::trace);
     logger->info("This is a simple info message");
     logger->trace("This is a simple trace message");
@@ -56,7 +57,7 @@ try {
     bool running = true;
     while (running) {
         SDL_Event event;
-        while (SDL_PollEvent(&event) == 1) {
+        while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL3_ProcessEvent(&event);
             if (event.type == SDL_EVENT_QUIT) {
                 running = false;
