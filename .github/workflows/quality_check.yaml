@@ -15,42 +15,42 @@ jobs:
         uses: fsfe/reuse-action@v5
 
   build:
-    name: "${{ matrix.config.name }}"
-    runs-on: "${{ matrix.config.os }}"
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - {
-              name: "Ubuntu Latest GCC",
-              os: ubuntu-latest,
-              artifact: "cocoboy_linux_checks_${{github.sha}}.tar.xz",
-              build-type: Debug,
-              conan-build: "conan-debug",
-              test-dir: build/Debug,
-              sudo: True
-            }
-          - {
-              name: "MacOS Latest Clang",
-              os: macos-latest,
-              artifact: "cocoboy_macos_checks_${{github.sha}}.tar.xz",
-              build-type: Debug,
-              conan-build: "conan-debug",
-              test-dir: build/Debug,
-              sudo: True
-            }
-          - {
-              name: "Windows Latest MSVC",
-              os: windows-latest,
-              artifact: "cocoboy_windows_checks_${{github.sha}}.tar.xz",
-              build-type: Debug,
-              conan-build: "conan-debug",
-              test-dir: build,
-              sudo: False
-            }
+        include:
+          - name: ubuntu-latest-gcc
+            os: ubuntu-latest
+            compiler: gcc
+            sudo: true
+          - name: macos-latest-clang
+            os: macos-latest
+            compiler: clang
+            sudo: true
+          - name: windows-latest-msvc
+            os: windows-latest
+            compiler: msvc
+            sudo: false
 
     steps:
       - uses: actions/checkout@v4
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./build/
+            ${{ env.CONAN_USER_HOME }}
+            ~/.cache/ccache
+            ~/.cache
+            ~/.config/ccache
+            ~/Library/Caches/ccache
+            ${{ env.LOCALAPPDATA }}/ccache
+            ${{ env.XDG_CACHE_HOME }}/ccache
+          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}-${{ hashFiles('**/CMakeLists.txt', './conanfile.py') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.BUILD_TYPE }}-
       - name: Setup CPP
         uses: aminya/setup-cpp@v1
         with:
@@ -59,9 +59,10 @@ jobs:
           cmake: true
           ninja: true
           vcpkg: false
+          ccache: true
           cppcheck: true
           clangtidy: true
-          conan: "2.16.0"
+          conan: "2.17.0"
 
       - name: Setup Conan Profile
         run: conan profile detect --force
@@ -70,32 +71,23 @@ jobs:
         run: >
           conan install .
           --build=missing
-          -s build_type=${{ matrix.config.build-type }}
+          -s build_type=Debug
           -c tools.cmake.cmaketoolchain:generator=Ninja
           -c tools.system.package_manager:mode=install
-          -c tools.system.package_manager:sudo=${{ matrix.config.sudo }}
+          -c tools.system.package_manager:sudo=${{ matrix.sudo }}
           -s compiler.cppstd=17
 
       - name: Configure CMake
         run: >
-          cmake -G Ninja --preset ${{ matrix.config.conan-build }}
+          cmake -G Ninja --preset conan-debug
           -DWARNINGS_AS_ERRORS=ON
           -DENABLE_TESTS=ON
           -DENABLE_CLANG_TIDY=ON
 
       - name: Build COCOBOY
-        run: cmake --build --preset ${{ matrix.config.conan-build }}
+        run: cmake --build --preset conan-debug
 
       - name: Run Tests
-        run: >
-          ctest --test-dir ${{ matrix.config.test-dir }}
-          -C ${{ matrix.config.build-type }}
-
-      - name: Packup Build
-        run: cmake -E tar cJfv ${{ matrix.config.artifact }} build
-
-      - name: Upload Build
-        uses: actions/upload-artifact@v4
-        with:
-          path: ./${{ matrix.config.artifact }}
-          name: "${{ matrix.config.artifact }}"
+        if: runner.os != 'Windows'
+        working-directory: ./build
+        run: ctest -C Debug

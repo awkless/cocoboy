@@ -180,17 +180,27 @@ endif()
 
 # Implement clang-tidy static analysis option...
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-if (ENABLE_CLANG_TIDY)
+if(ENABLE_CLANG_TIDY)
   find_program(clang_tidy_exe NAMES clang-tidy)
   if(clang_tidy_exe)
-    set(CMAKE_CXX_CLANG_TIDY
-        ${clang_tidy_exe}
-        -extra-arg=-Wno-unknown-warning-option
-        -checks=-*,clang-diagnostic-*,clang-analyzer-*,bugprone-*,modernize-*
-        -checks=-modernize-use-trailing-return-type,portability-*,performance-*
-        -checks=-modernize-avoid-c-arrays
-        -checks=readability-*,-readability-braces-around-statements
-    )
+    set(clang_tidy_checks
+      -checks=-*,clang-diagnostic-*,clang-analyzer-*,bugprone-*,modernize-*
+      -checks=-modernize-use-trailing-return-type,portability-*,performance-*
+      -checks=-modernize-avoid-c-arrays
+      -checks=readability-*,-readability-braces-around-statements)
+    if(MSVC)
+      set(CMAKE_CXX_CLANG_TIDY
+          ${clang_tidy_exe}
+          -extra-arg=/EHsc
+          ${clang_tidy_checks}
+      )
+    else()
+      set(CMAKE_CXX_CLANG_TIDY
+          ${clang_tidy_exe}
+          -extra-arg=-Wno-unknown-warning-option
+          ${clang_tidy_checks}
+      )
+    endif()
 
     if(WARNINGS_AS_ERRORS)
       list(APPEND CMAKE_CXX_CLANG_TIDY -warnings-as-errors=*)
