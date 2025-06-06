@@ -151,7 +151,7 @@ invoking Conan during the installation. For example:
 
 ### Conan Complains About Missing Packages
 
-Certain dependencies that COCOBOY requires are little bit finicky (SDL2 can be a
+Certain dependencies that COCOBOY requires are little bit finicky (SDL3 can be a
 real pain). Conan may not have the required recipies to handle the requirements
 of a given dependency, and will try to use your system's package manager (if
 available) to obtain them. By default Conan will only check to see if you have
@@ -176,3 +176,33 @@ by also passing `-c tools.system.package_manager:sudo=True`. For example:
 If nothing works, then you need to send a bug report. This may be an issue with
 Conan itself, but give me a heads up just in case it is an issue with the
 project before submitting anything to the people who maintain Conan.
+
+### The `libiconv/1.17` Package Fails With Weird Compiler Error About `mbrtowc`
+
+If you are encountering an a build failure similar to what is described by this
+[bug report][issue-27413], then you will need to add this little snippet to your
+default conan profile:
+
+```
+[conf]
+tools.build:cflags=["-std=gnu17"]
+```
+
+This error is caused by GCC 15 using the C23 standard by default, which causes
+this issue due to the `mbrtowc` prototype being declared without parameters,
+while its function definition has four parameters. This was fine in older
+standards of C, because the ancient K&R syntax allowed this. However, C23 fully
+removes K&R syntax, which causes the `mbrtowc` prototype to be interpreted as a
+function with no arguments despite its function definition having four.
+
+The `libiconv/1.18` package at Conan Center fixes this upstream issue, but
+`libgettext/0.22` still uses `libiconv/1.17`, and has yet to be updated in the
+Conan Center. Plus `libgettext/0.22` cannot be bypassed, because
+`pulseaudio/17.0` needs it, and `pulseaudio/17.0` is needed by `sdl/3.2.16`.
+So the SDL library is causing pain once again, but in a indirect fashion for
+funsies.
+
+For now, this little hack works. Hopefully, it will be fixed
+soon so I can remove this section.
+
+[issue-27413]: https://github.com/conan-io/conan-center-index/issues/27413
