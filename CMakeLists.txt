@@ -188,6 +188,7 @@ if(ENABLE_CLANG_TIDY)
       -checks=-modernize-use-trailing-return-type,portability-*,performance-*
       -checks=-modernize-avoid-c-arrays
       -checks=readability-*,-readability-braces-around-statements)
+
     if(MSVC)
       set(CMAKE_CXX_CLANG_TIDY
           ${clang_tidy_exe}
