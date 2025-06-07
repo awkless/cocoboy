@@ -2,22 +2,24 @@
 // SPDX-License-Identifier: MIT
 
 #include "config.hpp"
+#include "memory.hpp"
 
 #include <SDL3/SDL.h>
+#include <imgui.h>
 #include <imgui/backends/imgui_impl_sdl3.h>
 #include <imgui/backends/imgui_impl_sdlrenderer3.h>
-#include <imgui.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #include <cxxopts.hpp>
 
-#include <memory>
 #include <exception>
+#include <memory>
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 try {
-    std::unique_ptr<cxxopts::Options> parser = std::make_unique<cxxopts::Options>(argv[0], "- testing");
+    std::unique_ptr<cxxopts::Options> parser =
+        std::make_unique<cxxopts::Options>(argv[0], "- testing");
     bool version = false;
     constexpr size_t max_width = 90;
     auto& options = *parser;
@@ -31,7 +33,8 @@ try {
     fmt::print("{} {}\n", cocoboy::PROGRAM_NAME, cocoboy::PROGRAM_VERSION);
     fmt::print("{}\n\n", cocoboy::PROGRAM_DESCRIPTION);
 
-    auto logger = spdlog::stdout_color_mt(cocoboy::PROGRAM_NAME.data()); // NOLINT
+    std::shared_ptr<spdlog::logger> logger =
+        spdlog::stdout_color_mt(cocoboy::PROGRAM_NAME.data());  // NOLINT
     logger->set_level(spdlog::level::trace);
     logger->info("This is a simple info message");
     logger->trace("This is a simple trace message");
@@ -39,6 +42,9 @@ try {
     logger->warn("This is a simple warning message");
     logger->error("This is a simple error message");
     logger->critical("This is a simple critical error message");
+    cocoboy::MemoryBus memory(logger);
+    memory.read_byte(0xFF00);
+    memory.write_byte(0xDEAD, 0x34);
 
     constexpr int winWidth = 600;
     constexpr int winHeight = 400;

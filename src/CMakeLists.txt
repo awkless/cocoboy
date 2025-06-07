@@ -6,6 +6,6 @@ set(config_hpp_out "${CMAKE_BINARY_DIR}/src/config.hpp")
 configure_file(${config_hpp_in} ${config_hpp_out} @ONLY)
 
 add_executable(cocoboy)
-target_sources(cocoboy PRIVATE main.cpp)
+target_sources(cocoboy PRIVATE memory.cpp main.cpp)
 target_link_libraries(cocoboy PRIVATE cocoboy::deps)
 install(TARGETS cocoboy)
