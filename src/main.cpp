@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "config.hpp"
+#include "cpu.hpp"
 #include "memory.hpp"
 
 #include <SDL3/SDL.h>
@@ -15,16 +16,15 @@
 #include <exception>
 #include <memory>
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 try {
     std::unique_ptr<cxxopts::Options> parser =
         std::make_unique<cxxopts::Options>(argv[0], "- testing");
     bool version = false;
     constexpr size_t max_width = 90;
     auto& options = *parser;
-    options.set_width(max_width).set_tab_expansion().add_options()(
-        "v,version", "version info", cxxopts::value<bool>(version));
+    options.set_width(max_width).set_tab_expansion().add_options()("v,version", "version info",
+                                                                   cxxopts::value<bool>(version));
     auto result = options.parse(argc, argv);
 
     if (result.count("version") != 0U)
@@ -43,14 +43,12 @@ try {
     logger->error("This is a simple error message");
     logger->critical("This is a simple critical error message");
     cocoboy::MemoryBus memory(logger);
-    memory.read_byte(0xFF00);
-    memory.write_byte(0xDEAD, 0x34);
+    cocoboy::Sm83(logger, memory);
 
     constexpr int winWidth = 600;
     constexpr int winHeight = 400;
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-    SDL_Window* window =
-        SDL_CreateWindow("cocoboy", winWidth, winHeight, SDL_WINDOW_OPENGL);
+    SDL_Window* window = SDL_CreateWindow("cocoboy", winWidth, winHeight, SDL_WINDOW_OPENGL);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, nullptr);
 
     IMGUI_CHECKVERSION();
