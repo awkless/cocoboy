@@ -73,6 +73,24 @@ public:
     /// @return Register data converted into target type.
     operator T() const { return static_cast<T>(m_data); }
 
+    /// @brief Assign data through AND mask.
+    ///
+    /// @return Return AND masked self.
+    Register& operator&=(T val)
+    {
+        m_data &= val;
+        return *this;
+    }
+
+    /// @brief Assign data through OR mask.
+    ///
+    /// @return Return OR masked self.
+    Register& operator|=(T val)
+    {
+        m_data |= val;
+        return *this;
+    }
+
     /// @brief Prefix increment.
     ///
     /// @return Return incremented self.
@@ -94,6 +112,36 @@ public:
 private:
     /// Data held in register.
     T m_data;
+};
+
+/// @brief Control bits of register.
+template <unsigned int bitno, unsigned int nbits, typename T = uint8_t>
+class RegisterBit final {
+public:
+    /// @brief Construct new register bit controller.
+    explicit RegisterBit(Register<T>& reg) : m_reg(reg) {}
+
+    /// @brief Assign value into bits of register.
+    ///
+    /// @return Return self with new value.
+    RegisterBit& operator=(T val)
+    {
+        m_reg &= static_cast<T>(~(mask << bitno));
+        m_reg |= static_cast<T>(((val & mask) << bitno));
+        return *this;
+    }
+
+    /// @brief Implicitly convert bits of register into taraget type.
+    ///
+    /// @return Bits implicitly converted from register.
+    operator T() const { return (m_reg >> bitno) & mask; }
+
+private:
+    /// Mask for extracting register bits.
+    static constexpr T mask = (T(1) << nbits) - T(1);
+
+    /// Register to set bits inside of.
+    Register<T>& m_reg;
 };
 
 /// @brief Register pair representation.
@@ -146,6 +194,15 @@ template <typename T>
 struct formatter<cocoboy::Register<T>> : formatter<T> {
     template <typename FormatContext>
     auto format(const cocoboy::Register<T>& reg, FormatContext& ctx) const
+    {
+        return format_to(ctx.out(), "0x{:X}", static_cast<T>(reg));
+    }
+};
+
+template <unsigned int bitno, unsigned int nbits, typename T>
+struct formatter<cocoboy::RegisterBit<bitno, nbits, T>> : formatter<T> {
+    template <typename FormatContext>
+    auto format(const cocoboy::RegisterBit<bitno, nbits, T>& reg, FormatContext& ctx) const
     {
         return format_to(ctx.out(), "0x{:X}", static_cast<T>(reg));
     }
