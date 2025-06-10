@@ -66,7 +66,11 @@ public:
     explicit Register(T initial) : m_data(initial) {}
 
     /// @brief Assign data into register.
-    void operator=(T data) { m_data = data; }
+    Register& operator=(T data)
+    {
+        m_data = data;
+        return *this;
+    }
 
     /// @brief Implicitly convert register to target type.
     ///
@@ -164,11 +168,12 @@ public:
     }
 
     /// @brief Assign data into register pair.
-    void operator=(P data)
+    RegisterPair& operator=(P data)
     {
         constexpr unsigned int shift = std::numeric_limits<P>::digits / 2;
         m_high = static_cast<T>(data >> shift);
         m_low = static_cast<T>(data);
+        return *this;
     }
 
     /// @brief Implicitly convert register pair to target type.
