@@ -135,15 +135,13 @@ coding style through the `.clang-format` file at the top-level.
 - Members of a class must have a `m_` prefix in its name. If the member was
   declared static, then it must have a `s_` prefix in its name.
 - Template parameters for a function/method must be placed on its own line,
-  followed by the return type on its own line, then the name of the function.
+  followed by the return and the name of the function on this newline.
 - Use smart pointers instead of using malloc, free, new, or delete.
     - To keep ownership rules consistent and simple, pass by value with
       `std::unique_ptr<>`/`std::shared_ptr<>` to indicate that a caller is
       transferring ownership to a callee with parameters and return types.
       Otherwise, pass by pointer to indicate that the caller is not transferring
       ownership with parameters and return types.
-    - Do not use references with smart pointers unless you really have no other
-      choice.
 - All header files must have an include guard that is named by the current
   namespace the code belongs too, then the name of the header file itself, e.g.,
   `COCOBOY_CORE_MEMORY_HPP` signifies that the header file belongs to namespace
