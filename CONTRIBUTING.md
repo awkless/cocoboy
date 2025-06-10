@@ -142,6 +142,8 @@ coding style through the `.clang-format` file at the top-level.
       transferring ownership to a callee with parameters and return types.
       Otherwise, pass by pointer to indicate that the caller is not transferring
       ownership with parameters and return types.
+    - Do not use references with smart pointers unless you really have no other
+      choice.
 - All header files must have an include guard that is named by the current
   namespace the code belongs too, then the name of the header file itself, e.g.,
   `COCOBOY_CORE_MEMORY_HPP` signifies that the header file belongs to namespace
