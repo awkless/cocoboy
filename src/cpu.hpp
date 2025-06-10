@@ -81,11 +81,11 @@ public:
     /// send and receive computations from its instruction set.
     ///
     /// @return New SM83 CPU instance.
-    Sm83(std::shared_ptr<spdlog::logger>& logger, MemoryBus& bus);
+    Sm83(std::shared_ptr<spdlog::logger> logger, MemoryBus& bus);
 
 private:
     /// Logger to log internal state for debugging.
-    const std::shared_ptr<spdlog::logger>& m_logger;
+    std::shared_ptr<spdlog::logger> m_logger;
 
     /// Register file for CPU.
     Sm83RegisterFile m_register;

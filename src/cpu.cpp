@@ -27,7 +27,7 @@ Sm83RegisterFile::Sm83RegisterFile()
 {
 }
 
-Sm83::Sm83(std::shared_ptr<spdlog::logger>& logger, MemoryBus& bus) : m_logger(logger), m_bus(bus)
+Sm83::Sm83(std::shared_ptr<spdlog::logger> logger, MemoryBus& bus) : m_logger(logger), m_bus(bus)
 {
     m_logger->trace("Construct new SM83 CPU");
 }

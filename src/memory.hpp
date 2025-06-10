@@ -30,7 +30,7 @@ public:
     ///
     /// @param logger Shared logger to document internal state.
     /// @return Newly constructed memory bus.
-    explicit MemoryBus(const std::shared_ptr<spdlog::logger>& logger);
+    explicit MemoryBus(std::shared_ptr<spdlog::logger> logger);
 
     /// @brief Read byte from target address.
     ///
@@ -46,7 +46,7 @@ public:
 
 private:
     /// Internal logger used for logging important memory states.
-    const std::shared_ptr<spdlog::logger>& m_logger;
+    std::shared_ptr<spdlog::logger> m_logger;
 
     /// Full addressable random access memory representation.
     std::array<uint8_t, std::numeric_limits<uint16_t>::max()> m_ram;

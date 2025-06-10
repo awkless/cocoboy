@@ -7,7 +7,7 @@
 #include <memory>
 
 namespace cocoboy {
-MemoryBus::MemoryBus(const std::shared_ptr<spdlog::logger>& logger) : m_logger(logger)
+MemoryBus::MemoryBus(std::shared_ptr<spdlog::logger> logger) : m_logger(logger)
 {
     m_logger->trace("Construct new memory bus");
 }
