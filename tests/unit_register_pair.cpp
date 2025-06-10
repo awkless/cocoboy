@@ -8,16 +8,16 @@
 
 TEST_CASE("assignment operator works", "[register_pair]")
 {
-    cocoboy::Register<uint8_t> r1(0x00);
-    cocoboy::Register<uint8_t> r2(0x00);
-    cocoboy::RegisterPair<uint16_t, uint8_t> rp(r1, r2);
+    cocoboy::Register<uint8_t> reg1(0x00);
+    cocoboy::Register<uint8_t> reg2(0x00);
+    cocoboy::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
-    rp = 0xDEAD;
-    REQUIRE(rp == 0xDEAD);
-    REQUIRE(r1 == 0xDE);
-    REQUIRE(r2 == 0xAD);
+    reg_pair = 0xDEAD; // NOLINT
+    REQUIRE(reg_pair == 0xDEAD); // NOLINT
+    REQUIRE(reg1 == 0xDE); // NOLINT
+    REQUIRE(reg2 == 0xAD); // NOLINT
 
-    r1 = 0x12;
-    r2 = 0x34;
-    REQUIRE(rp == 0x1234);
+    reg1 = 0x12; // NOLINT
+    reg2 = 0x34; // NOLINT
+    REQUIRE(reg_pair == 0x1234); // NOLINT
 }
