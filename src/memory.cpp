@@ -24,28 +24,4 @@ void MemoryBus::write_byte(uint16_t address, uint8_t byte)
     m_logger->debug("Write 0x{0:02X} to address 0x{1:04X}", byte, address);
     m_ram[address] = byte;
 }
-
-ByteRegister::ByteRegister(uint8_t initial) : m_data(initial) {}
-
-void ByteRegister::operator=(uint8_t data)
-{
-    m_data = data;
-}
-
-ByteRegister::operator uint8_t() const
-{
-    return m_data;
-}
-
-ByteRegister& ByteRegister::operator++()
-{
-    m_data = m_data + 1;
-    return *this;
-}
-
-ByteRegister& ByteRegister::operator--()
-{
-    m_data = m_data - 1;
-    return *this;
-}
 }  // namespace cocoboy

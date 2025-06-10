@@ -52,46 +52,111 @@ private:
     std::array<uint8_t, std::numeric_limits<uint16_t>::max()> m_ram;
 };
 
-/// @brief Representation of an 8-bit register.
-class ByteRegister final {
+/// @brief Register representation.
+///
+/// Represents a register either meant to be controlled by the SM83 CPU, or a peripheral on the
+/// GameBoy SoC. Recommended to to use types with explicit bit sizes to make bit manipulation
+/// more predictable.
+template <typename T>
+class Register final {
 public:
-    /// @brief Construct new byte register from initial data.
-    explicit ByteRegister(uint8_t initial);
-
-    /// @brief Load contents of register through assignment operator.
-    void operator=(uint8_t data);
-
-    /// @brief Implicit conversion to `uint8_t`.
+    /// @brief Construct new register with initial state.
     ///
-    /// @return Contents of register to `uint8_t` variable implicitly.
-    operator uint8_t() const;
+    /// @return New instance of register.
+    explicit Register(T initial) : m_data(initial) {}
 
-    /// @brief Prefix increment operation.
-    ///
-    /// @return Instance of self.
-    ByteRegister& operator++();
+    /// @brief Assign data into register.
+    void operator=(T data) { m_data = data; }
 
-    /// @brief Prefix decrement operation.
+    /// @brief Implicitly convert register to target type.
     ///
-    /// @return Instance of self.
-    ByteRegister& operator--();
+    /// @return Register data converted into target type.
+    operator T() const { return static_cast<T>(m_data); }
+
+    /// @brief Prefix increment.
+    ///
+    /// @return Return incremented self.
+    Register& operator++()
+    {
+        m_data = m_data + 1;
+        return *this;
+    }
+
+    /// @brief Prefix decrement.
+    ///
+    /// @return Return decremented self.
+    Register& operator--()
+    {
+        m_data = m_data - 1;
+        return *this;
+    }
 
 private:
-    /// Contents of byte register.
-    uint8_t m_data;
+    /// Data held in register.
+    T m_data;
+};
 
-    /// Custom formatter for byte register, automatically uses hexadecimal.
-    friend struct fmt::formatter<ByteRegister>;
+/// @brief Register pair representation.
+///
+/// Uses two registers of the same type to form one larger register.
+///
+/// @invariant Bit length of P must be T * 2 bit length.
+template <typename P, typename T>
+class RegisterPair final {
+public:
+    /// @brief Construct new register pair through target register types.
+    ///
+    /// @return Newly constructed instance of register pair.
+    RegisterPair(Register<T>& high, Register<T>& low) : m_high(high), m_low(low)
+    {
+        constexpr unsigned int max_bits = std::numeric_limits<P>::digits;
+        constexpr unsigned int pair_bits = std::numeric_limits<T>::digits * 2;
+        static_assert(max_bits == pair_bits,
+                      "invalid bit length, need r1 bit length + r2 bit length = rp bit length");
+    }
+
+    /// @brief Assign data into register pair.
+    void operator=(P data)
+    {
+        constexpr unsigned int shift = std::numeric_limits<P>::digits / 2;
+        m_high = static_cast<T>(data >> shift);
+        m_low = static_cast<T>(data);
+    }
+
+    /// @brief Implicitly convert register pair to target type.
+    ///
+    /// @return Data of register pair as target type.
+    operator P() const
+    {
+        constexpr unsigned int shift = std::numeric_limits<P>::digits / 2;
+        return static_cast<P>((m_high << shift) | m_low);
+    }
+
+private:
+    /// High portion of register pair (r1).
+    Register<T>& m_high;
+
+    /// Low portion of register pair (r2).
+    Register<T>& m_low;
 };
 }  // namespace cocoboy
 
 namespace fmt {
-template <>
-struct formatter<cocoboy::ByteRegister> : formatter<uint8_t> {
+template <typename T>
+struct formatter<cocoboy::Register<T>> : formatter<T> {
     template <typename FormatContext>
-    auto format(const cocoboy::ByteRegister& reg, FormatContext& ctx) const
+    auto format(const cocoboy::Register<T>& reg, FormatContext& ctx) const
     {
-        return format_to(ctx.out(), "0x{:02X}", static_cast<uint8_t>(reg));
+        return format_to(ctx.out(), "0x{:X}", static_cast<T>(reg));
+    }
+};
+
+template <typename P, typename T>
+struct formatter<cocoboy::RegisterPair<P, T>> : formatter<T> {
+    template <typename FormatContext>
+    auto format(const cocoboy::RegisterPair<P, T>& reg, FormatContext& ctx) const
+    {
+        return format_to(ctx.out(), "0x{:X}", static_cast<P>(reg));
     }
 };
 }  // namespace fmt
