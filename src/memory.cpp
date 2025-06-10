@@ -7,24 +7,45 @@
 #include <memory>
 
 namespace cocoboy {
-MemoryBus::MemoryBus(const std::shared_ptr<spdlog::logger>& logger)
-    : m_logger(logger)
+MemoryBus::MemoryBus(const std::shared_ptr<spdlog::logger>& logger) : m_logger(logger)
 {
     m_logger->trace("Construct new memory bus");
 }
 
-uint8_t
-MemoryBus::read_byte(uint16_t address)
+uint8_t MemoryBus::read_byte(uint16_t address)
 {
     uint8_t byte = m_ram[address];
     m_logger->debug("Read 0x{0:02X} from address 0x{1:04X}", byte, address);
     return m_ram[address];
 }
 
-void
-MemoryBus::write_byte(uint16_t address, uint8_t byte)
+void MemoryBus::write_byte(uint16_t address, uint8_t byte)
 {
     m_logger->debug("Write 0x{0:02X} to address 0x{1:04X}", byte, address);
     m_ram[address] = byte;
+}
+
+ByteRegister::ByteRegister(uint8_t initial) : m_data(initial) {}
+
+void ByteRegister::operator=(uint8_t data)
+{
+    m_data = data;
+}
+
+ByteRegister::operator uint8_t() const
+{
+    return m_data;
+}
+
+ByteRegister& ByteRegister::operator++()
+{
+    m_data = m_data + 1;
+    return *this;
+}
+
+ByteRegister& ByteRegister::operator--()
+{
+    m_data = m_data - 1;
+    return *this;
 }
 }  // namespace cocoboy
