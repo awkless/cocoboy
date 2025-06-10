@@ -12,6 +12,10 @@ namespace cocoboy {
 Sm83RegisterFile::Sm83RegisterFile()
     : a(0x00),
       f(0x00),
+      f_z(f),
+      f_n(f),
+      f_h(f),
+      f_c(f),
       b(0x00),
       c(0x00),
       d(0x00),

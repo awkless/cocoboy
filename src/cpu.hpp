@@ -26,6 +26,18 @@ struct Sm83RegisterFile final {
     /// Flags register.
     Register<uint8_t> f;
 
+    /// Zero flag.
+    RegisterBit<7, 1, uint8_t> f_z;
+
+    /// Subtraction flag (BCD).
+    RegisterBit<6, 1, uint8_t> f_n;
+
+    /// Half carry flag (BCD).
+    RegisterBit<5, 1, uint8_t> f_h;
+
+    /// Carry flag.
+    RegisterBit<4, 1, uint8_t> f_c;
+
     /// General purpse register.
     Register<uint8_t> b;
 
