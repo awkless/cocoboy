@@ -10,7 +10,7 @@
 #include <limits>
 #include <memory>
 
-namespace cocoboy {
+namespace cocoboy::soc {
 /// @brief Shared physical system memory.
 ///
 /// Original GameBoy hardware utilizes a 16-bit address bus, and an 8-bit data
@@ -196,27 +196,27 @@ private:
 
 namespace fmt {
 template <typename T>
-struct formatter<cocoboy::Register<T>> : formatter<T> {
+struct formatter<cocoboy::soc::Register<T>> : formatter<T> {
     template <typename FormatContext>
-    auto format(const cocoboy::Register<T>& reg, FormatContext& ctx) const
+    auto format(const cocoboy::soc::Register<T>& reg, FormatContext& ctx) const
     {
         return format_to(ctx.out(), "0x{:X}", static_cast<T>(reg));
     }
 };
 
 template <unsigned int bitno, unsigned int nbits, typename T>
-struct formatter<cocoboy::RegisterBit<bitno, nbits, T>> : formatter<T> {
+struct formatter<cocoboy::soc::RegisterBit<bitno, nbits, T>> : formatter<T> {
     template <typename FormatContext>
-    auto format(const cocoboy::RegisterBit<bitno, nbits, T>& reg, FormatContext& ctx) const
+    auto format(const cocoboy::soc::RegisterBit<bitno, nbits, T>& reg, FormatContext& ctx) const
     {
         return format_to(ctx.out(), "0x{:X}", static_cast<T>(reg));
     }
 };
 
 template <typename P, typename T>
-struct formatter<cocoboy::RegisterPair<P, T>> : formatter<T> {
+struct formatter<cocoboy::soc::RegisterPair<P, T>> : formatter<T> {
     template <typename FormatContext>
-    auto format(const cocoboy::RegisterPair<P, T>& reg, FormatContext& ctx) const
+    auto format(const cocoboy::soc::RegisterPair<P, T>& reg, FormatContext& ctx) const
     {
         return format_to(ctx.out(), "0x{:X}", static_cast<P>(reg));
     }

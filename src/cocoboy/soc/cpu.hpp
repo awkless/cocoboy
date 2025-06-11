@@ -4,15 +4,16 @@
 #ifndef COCOBOY_CPU_HPP
 #define COCOBOY_CPU_HPP
 
-#include "memory.hpp"
+#include "cocoboy/soc/memory.hpp"
 
 #include <fmt/format.h>
 #include <spdlog/logger.h>
 #include <cstdint>
 #include <limits>
 #include <memory>
+#include <array>
 
-namespace cocoboy {
+namespace cocoboy::soc {
 /// @brief SM83 register file representation.
 struct Sm83RegisterFile final {
     /// @brief Construct new register file.
@@ -73,6 +74,8 @@ struct Sm83RegisterFile final {
 
     /// Program counter register.
     Register<uint16_t> pc;
+
+    std::array<Register<uint8_t>*, 8> r8 = { &b, &c, &d, &e, &h, &l, &a };
 };
 
 /// @brief Implementation of SM83 CPU for GameBoy SoC.
@@ -95,12 +98,14 @@ public:
     /// @return New SM83 CPU instance.
     Sm83(std::shared_ptr<spdlog::logger> logger, MemoryBus& bus);
 
+    void execute();
+
+    /// Register file for CPU.
+    Sm83RegisterFile m_reg;
+
 private:
     /// Logger to log internal state for debugging.
     std::shared_ptr<spdlog::logger> m_logger;
-
-    /// Register file for CPU.
-    Sm83RegisterFile m_register;
 
     /// Memory bus to send and receive computations from instruction set.
     MemoryBus& m_bus;

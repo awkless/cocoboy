@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
 // SPDX-License-Identifier: MIT
 
-#include "memory.hpp"
+#include "cocoboy/soc/memory.hpp"
 
 #include <spdlog/spdlog.h>
 #include <memory>
 
-namespace cocoboy {
+namespace cocoboy::soc {
 MemoryBus::MemoryBus(std::shared_ptr<spdlog::logger> logger) : m_logger(logger)
 {
     m_logger->trace("Construct new memory bus");
