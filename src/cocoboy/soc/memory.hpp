@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
 // SPDX-License-Identifier: MIT
 
-#ifndef COCOBOY_MEMORY_HPP
-#define COCOBOY_MEMORY_HPP
+#ifndef COCOBOY_SOC_MEMORY_HPP
+#define COCOBOY_SOC_MEMORY_HPP
 
 #include <spdlog/spdlog.h>
 #include <array>
@@ -223,4 +223,4 @@ struct formatter<cocoboy::soc::RegisterPair<P, T>> : formatter<T> {
 };
 }  // namespace fmt
 
-#endif  // COCOBOY_MEMORY_HPP
+#endif  // COCOBOY_SOC_MEMORY_HPP
