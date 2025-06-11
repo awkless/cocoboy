@@ -82,4 +82,4 @@ jobs:
       - name: Run Tests
         if: runner.os != 'Windows'
         working-directory: ./build
-        run: ctest -C Debug
+        run: ctest --test-dir Debug
