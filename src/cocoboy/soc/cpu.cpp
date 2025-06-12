@@ -110,7 +110,7 @@ void Sm83OpcodeRunner::ld_a_bc(uint8_t opcode)
 void Sm83OpcodeRunner::ld_a_de(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD A, (DE)", m_reg.pc - 1, opcode);
-    m_reg.a = m_bus[m_reg.bc];
+    m_reg.a = m_bus[m_reg.de];
 }
 
 void Sm83OpcodeRunner::ld_bc_a(uint8_t opcode)
@@ -129,34 +129,45 @@ void Sm83OpcodeRunner::ld_a_nn(uint8_t opcode)
 {
     uint8_t high = m_bus[m_reg.pc];
     uint8_t low = m_bus[m_reg.pc + 1];
-    uint16_t data = (high << 8) | low;  // NOLINT
-    m_logger->debug("Run: [{0:04X} -> {1:02X} {2:02X} {3:02X}] LD A, ({4:04X})", m_reg.pc - 1,
-                    opcode, high, low, data);
+    uint16_t addr = static_cast<uint16_t>((high << 8) | low);
+    m_logger->debug(
+        "Run: [{0:04X} -> {1:02X} {2:02X} {3:02X}] LD A, ({4:04X})",
+        m_reg.pc - 1, opcode, high, low, addr
+    );
     m_reg.pc = m_reg.pc + 2;
-    m_reg.a = m_bus[data];
+    m_reg.a = m_bus[addr];
 }
 
-void Sm83OpcodeRunner::ldh_a_n(uint8_t opcode)
+void Sm83OpcodeRunner::ld_nn_a(uint8_t opcode)
 {
     uint8_t high = m_bus[m_reg.pc];
     uint8_t low = m_bus[m_reg.pc + 1];
-    uint16_t data = (high << 8) | low;
+    uint16_t addr = static_cast<uint16_t>((high << 8) | low);
     m_logger->debug("Run: [{0:04X} -> {1:02X} {2:02X} {3:02X}] LD ({4:04X}) A", m_reg.pc - 1,
-                    opcode, high, low, data);
+                    opcode, high, low, addr);
     m_reg.pc = m_reg.pc + 2;
-    m_bus[data] = m_reg.a;
+    m_bus[addr] = m_reg.a;
 }
 
 void Sm83OpcodeRunner::ldh_a_c(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LDH A, (C)", m_reg.pc - 1, opcode);
-    m_reg.a = m_bus[(m_reg.c << 8) | 0xFF];
+    m_reg.a = m_bus[static_cast<uint16_t>((m_reg.c << 8) | 0xFF)];
 }
 
 void Sm83OpcodeRunner::ldh_c_a(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LDH (C), A", m_reg.pc - 1, opcode);
-    m_bus[(m_reg.c << 8) | 0xFF] = m_reg.a;
+    m_bus[static_cast<uint16_t>((m_reg.c << 8) | 0xFF)] = m_reg.a;
+}
+
+void Sm83OpcodeRunner::ldh_a_n(uint8_t opcode)
+{
+    uint8_t offset = m_bus[m_reg.pc];
+    m_logger->debug("Run: [{0:04X} -> {1:02X} {2:02X}] LDH ({2:02X}) A", m_reg.pc - 1, opcode,
+                    offset);
+    ++m_reg.pc;
+    m_reg.a = m_bus[static_cast<uint16_t>((offset << 8) | 0xFF)];
 }
 
 void Sm83OpcodeRunner::ldh_n_a(uint8_t opcode)
@@ -165,7 +176,7 @@ void Sm83OpcodeRunner::ldh_n_a(uint8_t opcode)
     m_logger->debug("Run: [{0:04X} -> {1:02X} {2:02X}] LDH ({2:02X}) A", m_reg.pc - 1, opcode,
                     offset);
     ++m_reg.pc;
-    m_bus[(offset << 8) | 0xFF] = m_reg.a;
+    m_bus[static_cast<uint16_t>((offset << 8) | 0xFF)] = m_reg.a;
 }
 
 void Sm83OpcodeRunner::ld_a_hlm(uint8_t opcode)
@@ -305,6 +316,9 @@ void Sm83::step()
             break;
         case Sm83Opcode::LD_A_NN:
             m_opcode.ld_a_nn(opcode);
+            break;
+        case Sm83Opcode::LD_NN_A:
+            m_opcode.ld_nn_a(opcode);
             break;
         case Sm83Opcode::LDH_A_C:
             m_opcode.ldh_a_c(opcode);

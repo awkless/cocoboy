@@ -107,11 +107,11 @@ TEST_CASE("void Sm83OpcodeRunner::ld_r_r(uint8_t opcode)", "[sm83_opcode_runner]
     for (size_t i = 0; i < reg_file.r8.size(); ++i) {
         *reg_file.r8[i] = values[i];
     }
-    
+
     for (unsigned int i = 0; i < max_ld_r_r_targets; ++i) {
         uint8_t target = ld_r_r_targets[i];
-        uint8_t regx = (target & 0x38) >> 3; // NOLINT
-        uint8_t regy = target & 0x07; // NOLINT
+        uint8_t regx = (target & 0x38) >> 3;
+        uint8_t regy = target & 0x07;
 
         opcode.ld_r_r(target);
         CHECK(static_cast<uint8_t>(*reg_file.r8[regx]) == values[regy]);
@@ -143,7 +143,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_r_n(uint8_t opcode)", "[sm83_opcode_runner]
         uint8_t target = bus[reg_file.pc];
         ++reg_file.pc;
 
-        uint8_t regx = (target & 0x38) >> 3; // NOLINT
+        uint8_t regx = (target & 0x38) >> 3;
         opcode.ld_r_n(target);
         CHECK(static_cast<uint8_t>(*reg_file.r8[regx]) == values[i]);
     }
@@ -156,24 +156,24 @@ TEST_CASE("void Sm83OpcodeRunner::ld_r_hl(uint8_t opcode)", "[sm83_opcode_runner
     cocoboy::soc::Sm83RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
-    reg_file.hl = 0xBEEF; // NOLINT
-    bus[reg_file.hl] = 0x42; // NOLINT
+    reg_file.hl = 0xBEEF;
+    bus[reg_file.hl] = 0x42;
 
-    reg_file.pc = 0x0100; // NOLINT
+    reg_file.pc = 0x0100;
     for (size_t i = 0; i < max_ld_r_hl_targets; ++i) {
         bus[reg_file.pc] = ld_r_hl_targets[i];
         ++reg_file.pc;
     }
 
-    reg_file.pc = 0x0100; // NOLINT
+    reg_file.pc = 0x0100;
     for (size_t i = 0; i < max_ld_r_hl_targets; ++i) {
         uint8_t target = bus[reg_file.pc];
         ++reg_file.pc;
 
-        uint8_t regx = (target & 0x38) >> 3; // NOLINT
+        uint8_t regx = (target & 0x38) >> 3;
         opcode.ld_r_hl(target);
-        CHECK(static_cast<uint8_t>(*reg_file.r8[regx]) == 0x42); // NOLINT
-        reg_file.hl = 0xBEEF; // NOLINT
+        CHECK(static_cast<uint8_t>(*reg_file.r8[regx]) == 0x42);
+        reg_file.hl = 0xBEEF;
     }
 }
 
@@ -189,22 +189,22 @@ TEST_CASE("void Sm83OpcodeRunner::ld_hl_r(uint8_t opcode)", "[sm83_opcode_runner
         *reg_file.r8[i] = values[i];
     }
 
-    reg_file.pc = 0x0100; // NOLINT
+    reg_file.pc = 0x0100;
     for (size_t i = 0; i < max_ld_hl_r_targets; ++i) {
         bus[reg_file.pc] = ld_hl_r_targets[i];
         ++reg_file.pc;
     }
 
-    reg_file.hl = 0xBEEF; // NOLINT
-    reg_file.pc = 0x0100; // NOLINT
+    reg_file.hl = 0xBEEF;
+    reg_file.pc = 0x0100;
     for (size_t i = 0; i < max_ld_r_hl_targets; ++i) {
         uint8_t target = bus[reg_file.pc];
         ++reg_file.pc;
 
         uint8_t regx = target & 0x03;
         opcode.ld_hl_r(target);
-        CHECK(bus[reg_file.hl] == values[regx]); // NOLINT
-        reg_file.hl = 0xBEEF; // NOLINT
+        CHECK(bus[reg_file.hl] == values[regx]);
+        reg_file.hl = 0xBEEF;
     }
 }
 
@@ -215,7 +215,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_hl_n(uint8_t opcode)", "[sm83_opcode_runner
     cocoboy::soc::Sm83RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
-    reg_file.pc = 0x0100; // NOLINT
+    reg_file.pc = 0x0100;
     constexpr uint8_t values[3] = { 0xBF, 0x42, 0xFF };
     for (size_t i = 0; i < 3; ++i) {
         bus[reg_file.pc] = cocoboy::soc::Sm83Opcode::LD_HL_N;
@@ -225,12 +225,212 @@ TEST_CASE("void Sm83OpcodeRunner::ld_hl_n(uint8_t opcode)", "[sm83_opcode_runner
     }
 
     reg_file.hl = 0xBEEF;
-    reg_file.pc = 0x0100; // NOLINT
+    reg_file.pc = 0x0100;
     for (size_t i = 0; i < 3; ++i) {
         uint8_t target = bus[reg_file.pc];
         ++reg_file.pc;
 
         opcode.ld_hl_n(target);
-        CHECK(bus[reg_file.hl] == values[i]); // NOLINT
+        CHECK(bus[reg_file.hl] == values[i]);
     }
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ld_a_bc(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (BC)");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    reg_file.bc = 0xBEEF;
+    reg_file.pc = 0x0100;
+    bus[reg_file.bc] = 0x42;
+    bus[reg_file.pc] = cocoboy::soc::Sm83Opcode::LD_A_BC;
+    opcode.ld_a_bc(bus[reg_file.pc]);
+    CHECK(static_cast<uint8_t>(reg_file.a) == 0x42);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ld_a_de(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (DE)");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    reg_file.de = 0xBEEF;
+    reg_file.pc = 0x0100;
+    bus[reg_file.de] = 0x42;
+    bus[reg_file.pc] = cocoboy::soc::Sm83Opcode::LD_A_DE;
+    opcode.ld_a_de(bus[reg_file.pc]);
+    CHECK(static_cast<uint8_t>(reg_file.a) == 0x42);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ld_bc_a(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (BC), A");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    reg_file.bc = 0xBEEF;
+    reg_file.pc = 0x0100;
+    reg_file.a = 0x42;
+    bus[reg_file.pc] = cocoboy::soc::Sm83Opcode::LD_BC_A;
+    opcode.ld_bc_a(bus[reg_file.pc]);
+    CHECK(bus[reg_file.bc] == 0x42);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ld_de_a(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (DE), A");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    reg_file.de = 0xBEEF;
+    reg_file.pc = 0x0100;
+    reg_file.a = 0x42;
+    bus[reg_file.pc] = cocoboy::soc::Sm83Opcode::LD_DE_A;
+    opcode.ld_de_a(bus[reg_file.pc]);
+    CHECK(bus[reg_file.de] == 0x42);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ld_a_nn(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (NN)");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    bus[0x0101] = 0xBE;
+    bus[0x0102] = 0xEF;
+    bus[0xBEEF] = 0x42;
+
+    reg_file.pc = 0x0101;
+    opcode.ld_a_nn(cocoboy::soc::Sm83Opcode::LD_A_NN);
+    CHECK(static_cast<uint8_t>(reg_file.a) == 0x42);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ld_nn_a(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (NN), A");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    bus[0x0101] = 0xBE;
+    bus[0x0102] = 0xEF;
+    reg_file.a = 0x42;
+
+    reg_file.pc = 0x0101;
+    opcode.ld_nn_a(cocoboy::soc::Sm83Opcode::LD_NN_A);
+    CHECK(bus[0xBEEF] == 0x42);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ldh_a_c(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LDH A, (C)");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    reg_file.c = 0x01;
+    bus[0x01FF] = 0x42;
+    opcode.ldh_a_c(cocoboy::soc::Sm83Opcode::LDH_A_C);
+    CHECK(static_cast<uint8_t>(reg_file.a) == 0x42);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ldh_c_a(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (C), A");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    reg_file.c = 0x01;
+    reg_file.a = 0x42;
+    opcode.ldh_c_a(cocoboy::soc::Sm83Opcode::LDH_C_A);
+    CHECK(bus[0x01FF] == 0x42);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ldh_a_n(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (N)");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    bus[0x0100] = 0xBF;
+    bus[0xBFFF] = 0x42;
+    opcode.ldh_a_n(cocoboy::soc::Sm83Opcode::LDH_A_N);
+    CHECK(static_cast<uint8_t>(reg_file.a) == 0x42);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ldh_n_a(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (N), A");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    bus[0x0100] = 0xBF;
+    reg_file.a = 0x42;
+    opcode.ldh_n_a(cocoboy::soc::Sm83Opcode::LDH_N_A);
+    CHECK(bus[0xBFFF] == 0x42);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ld_a_hlm(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (HL-)");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    reg_file.hl = 0xFFE0;
+    bus[reg_file.hl] = 0x42;
+    opcode.ld_a_hlm(cocoboy::soc::Sm83Opcode::LD_A_HLM);
+    CHECK(static_cast<uint8_t>(reg_file.a) == 0x42);
+    CHECK(static_cast<uint16_t>(reg_file.hl) == 0xFFDF);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ld_hlm_a(uint8_t opcode)", "[sm83_opcode_runner]")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (HL-), A");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    reg_file.hl = 0xFFE0;
+    reg_file.a = 0x42;
+    opcode.ld_hlm_a(cocoboy::soc::Sm83Opcode::LD_HLM_A);
+    CHECK(bus[0xFFE0] == 0x42);
+    CHECK(static_cast<uint16_t>(reg_file.hl) == 0xFFDF);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ld_a_hlp(uint8_t opcode)", "sm83_opcode_runner")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (HL+)");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    reg_file.hl = 0xFFE0;
+    bus[reg_file.hl] = 0x42;
+    opcode.ld_a_hlp(cocoboy::soc::Sm83Opcode::LD_A_HLP);
+    CHECK(static_cast<uint8_t>(reg_file.a) == 0x42);
+    CHECK(static_cast<uint16_t>(reg_file.hl) == 0xFFE1);
+}
+
+TEST_CASE("void Sm83OpcodeRunner::ld_hlp_a(uint8_t opcode)", "sm83_opcode_runner")
+{
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (HL+), A");
+    cocoboy::soc::MemoryBus bus(logger);
+    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
+
+    reg_file.hl = 0xFFE0;
+    reg_file.a = 0x42;
+    opcode.ld_hlp_a(cocoboy::soc::Sm83Opcode::LD_HLP_A);
+    CHECK(bus[0xFFE0] == 0x42);
+    CHECK(static_cast<uint16_t>(reg_file.hl) == 0xFFE1);
 }
