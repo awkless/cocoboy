@@ -32,17 +32,9 @@ public:
     /// @return Newly constructed memory bus.
     explicit MemoryBus(std::shared_ptr<spdlog::logger> logger);
 
-    /// @brief Read byte from target address.
-    ///
-    /// @param address Valid 16-bit address.
-    /// @return Current byte from target address.
-    uint8_t read_byte(uint16_t address);
+    const uint8_t& operator[](uint16_t address) const;
 
-    /// @brief Write byte to target address.
-    ///
-    /// @param address Valid 16-bit address.
-    /// @param byte Byte to write to target address.
-    void write_byte(uint16_t address, uint8_t byte);
+    uint8_t& operator[](uint16_t address);
 
 private:
     /// Internal logger used for logging important memory states.

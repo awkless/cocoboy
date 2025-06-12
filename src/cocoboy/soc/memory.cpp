@@ -12,16 +12,15 @@ MemoryBus::MemoryBus(std::shared_ptr<spdlog::logger> logger) : m_logger(logger)
     m_logger->trace("Construct new memory bus");
 }
 
-uint8_t MemoryBus::read_byte(uint16_t address)
+const uint8_t& MemoryBus::operator[](uint16_t address) const
 {
-    uint8_t byte = m_ram[address];
-    m_logger->debug("Read 0x{0:02X} from address 0x{1:04X}", byte, address);
+    m_logger->debug("Access address {0:04X}");
     return m_ram[address];
 }
 
-void MemoryBus::write_byte(uint16_t address, uint8_t byte)
+uint8_t& MemoryBus::operator[](uint16_t address)
 {
-    m_logger->debug("Write 0x{0:02X} to address 0x{1:04X}", byte, address);
-    m_ram[address] = byte;
+    m_logger->debug("Access address {0:04X}", address);
+    return m_ram[address];
 }
 }  // namespace cocoboy::soc

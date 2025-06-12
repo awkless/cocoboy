@@ -132,15 +132,15 @@ TEST_CASE("void Sm83OpcodeRunner::ld_r_n(uint8_t opcode)", "[sm83_opcode_runner]
     uint8_t values[max_ld_r_n_targets] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
     reg_file.pc = 0x0100;
     for (size_t i = 0; i < max_ld_r_n_targets; ++i) {
-        bus.write_byte(reg_file.pc, ld_r_n_targets[i]);
+        bus[reg_file.pc] = ld_r_n_targets[i];
         ++reg_file.pc;
-        bus.write_byte(reg_file.pc, values[i]);
+        bus[reg_file.pc] = values[i];
         ++reg_file.pc;
     }
 
     reg_file.pc = 0x0100;
     for (size_t i = 0; i < max_ld_r_n_targets; ++i) {
-        uint8_t target = bus.read_byte(reg_file.pc);
+        uint8_t target = bus[reg_file.pc];
         ++reg_file.pc;
 
         uint8_t regx = (target & 0x38) >> 3; // NOLINT
@@ -157,17 +157,17 @@ TEST_CASE("void Sm83OpcodeRunner::ld_r_hl(uint8_t opcode)", "[sm83_opcode_runner
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.hl = 0xBEEF; // NOLINT
-    bus.write_byte(reg_file.hl, 0x42); // NOLINT
+    bus[reg_file.hl] = 0x42; // NOLINT
 
     reg_file.pc = 0x0100; // NOLINT
     for (size_t i = 0; i < max_ld_r_hl_targets; ++i) {
-        bus.write_byte(reg_file.pc, ld_r_hl_targets[i]);
+        bus[reg_file.pc] = ld_r_hl_targets[i];
         ++reg_file.pc;
     }
 
     reg_file.pc = 0x0100; // NOLINT
     for (size_t i = 0; i < max_ld_r_hl_targets; ++i) {
-        uint8_t target = bus.read_byte(reg_file.pc);
+        uint8_t target = bus[reg_file.pc];
         ++reg_file.pc;
 
         uint8_t regx = (target & 0x38) >> 3; // NOLINT
@@ -191,19 +191,19 @@ TEST_CASE("void Sm83OpcodeRunner::ld_hl_r(uint8_t opcode)", "[sm83_opcode_runner
 
     reg_file.pc = 0x0100; // NOLINT
     for (size_t i = 0; i < max_ld_hl_r_targets; ++i) {
-        bus.write_byte(reg_file.pc, ld_hl_r_targets[i]);
+        bus[reg_file.pc] = ld_hl_r_targets[i];
         ++reg_file.pc;
     }
 
     reg_file.hl = 0xBEEF; // NOLINT
     reg_file.pc = 0x0100; // NOLINT
     for (size_t i = 0; i < max_ld_r_hl_targets; ++i) {
-        uint8_t target = bus.read_byte(reg_file.pc);
+        uint8_t target = bus[reg_file.pc];
         ++reg_file.pc;
 
         uint8_t regx = target & 0x03;
         opcode.ld_hl_r(target);
-        CHECK(bus.read_byte(reg_file.hl) == values[regx]); // NOLINT
+        CHECK(bus[reg_file.hl] == values[regx]); // NOLINT
         reg_file.hl = 0xBEEF; // NOLINT
     }
 }
@@ -218,19 +218,19 @@ TEST_CASE("void Sm83OpcodeRunner::ld_hl_n(uint8_t opcode)", "[sm83_opcode_runner
     reg_file.pc = 0x0100; // NOLINT
     constexpr uint8_t values[3] = { 0xBF, 0x42, 0xFF };
     for (size_t i = 0; i < 3; ++i) {
-        bus.write_byte(reg_file.pc, cocoboy::soc::Sm83Opcode::LD_HL_N);
+        bus[reg_file.pc] = cocoboy::soc::Sm83Opcode::LD_HL_N;
         ++reg_file.pc;
-        bus.write_byte(reg_file.pc, values[i]);
+        bus[reg_file.pc] = values[i];
         ++reg_file.pc;
     }
 
     reg_file.hl = 0xBEEF;
     reg_file.pc = 0x0100; // NOLINT
     for (size_t i = 0; i < 3; ++i) {
-        uint8_t target = bus.read_byte(reg_file.pc);
+        uint8_t target = bus[reg_file.pc];
         ++reg_file.pc;
 
         opcode.ld_hl_n(target);
-        CHECK(bus.read_byte(reg_file.hl) == values[i]); // NOLINT
+        CHECK(bus[reg_file.hl] == values[i]); // NOLINT
     }
 }

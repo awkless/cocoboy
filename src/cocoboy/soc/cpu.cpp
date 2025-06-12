@@ -72,7 +72,7 @@ void Sm83OpcodeRunner::ld_r_r(uint8_t opcode)
 void Sm83OpcodeRunner::ld_r_n(uint8_t opcode)
 {
     uint8_t reg = (opcode & 0x38) >> 3;
-    uint8_t data = m_bus.read_byte(m_reg.pc);
+    uint8_t data = m_bus[m_reg.pc];
     m_logger->debug("Run: [{0:04X} -> {1:02X} {2:02X}] LD {3}, {2:02X}", m_reg.pc - 1, opcode, data,
                     reg8_name(reg));
     ++m_reg.pc;
@@ -83,117 +83,116 @@ void Sm83OpcodeRunner::ld_r_hl(uint8_t opcode)
 {
     uint8_t reg = (opcode & 0x38) >> 3;
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD {2}, (HL)", m_reg.pc - 1, opcode, reg8_name(reg));
-    *m_reg.r8[reg] = m_bus.read_byte(m_reg.hl);
+    *m_reg.r8[reg] = m_bus[m_reg.hl];
 }
 
 void Sm83OpcodeRunner::ld_hl_r(uint8_t opcode)
 {
     uint8_t reg = opcode & 0x03;
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD (HL), {2}", m_reg.pc - 1, opcode, reg8_name(reg));
-    m_bus.write_byte(m_reg.hl, *m_reg.r8[reg]);
+    m_bus[m_reg.hl] = *m_reg.r8[reg];
 }
 
 void Sm83OpcodeRunner::ld_hl_n(uint8_t opcode)
 {
-    uint8_t data = m_bus.read_byte(m_reg.pc);
+    uint8_t data = m_bus[m_reg.pc];
     m_logger->debug("Run: [{0:04X} -> {1:02X} {2:02X}] LD (HL) {2:02}", m_reg.pc - 1, opcode, data);
     ++m_reg.pc;
-    m_bus.write_byte(m_reg.hl, data);
+    m_bus[m_reg.hl] = data;
 }
 
 void Sm83OpcodeRunner::ld_a_bc(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD A, (BC)", m_reg.pc - 1, opcode);
-    m_reg.a = m_bus.read_byte(m_reg.bc);
+    m_reg.a = m_bus[m_reg.bc];
 }
 
 void Sm83OpcodeRunner::ld_a_de(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD A, (DE)", m_reg.pc - 1, opcode);
-    m_reg.a = m_bus.read_byte(m_reg.bc);
+    m_reg.a = m_bus[m_reg.bc];
 }
 
 void Sm83OpcodeRunner::ld_bc_a(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD (BC), A", m_reg.pc - 1, opcode);
-    m_bus.write_byte(m_reg.bc, m_reg.a);
+    m_bus[m_reg.bc] = m_reg.a;
 }
 
 void Sm83OpcodeRunner::ld_de_a(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD (DE), A", m_reg.pc - 1, opcode);
-    m_bus.write_byte(m_reg.de, m_reg.a);
+    m_bus[m_reg.de] = m_reg.a;
 }
 
 void Sm83OpcodeRunner::ld_a_nn(uint8_t opcode)
 {
-    uint8_t high = m_bus.read_byte(m_reg.pc);
-    uint8_t low = m_bus.read_byte(m_reg.pc + 1);
+    uint8_t high = m_bus[m_reg.pc];
+    uint8_t low = m_bus[m_reg.pc + 1];
     uint16_t data = (high << 8) | low;  // NOLINT
     m_logger->debug("Run: [{0:04X} -> {1:02X} {2:02X} {3:02X}] LD A, ({4:04X})", m_reg.pc - 1,
                     opcode, high, low, data);
     m_reg.pc = m_reg.pc + 2;
-    m_reg.a = m_bus.read_byte(data);
+    m_reg.a = m_bus[data];
 }
 
 void Sm83OpcodeRunner::ldh_a_n(uint8_t opcode)
 {
-    uint8_t high = m_bus.read_byte(m_reg.pc);
-    uint8_t low = m_bus.read_byte(m_reg.pc + 1);
+    uint8_t high = m_bus[m_reg.pc];
+    uint8_t low = m_bus[m_reg.pc + 1];
     uint16_t data = (high << 8) | low;
     m_logger->debug("Run: [{0:04X} -> {1:02X} {2:02X} {3:02X}] LD ({4:04X}) A", m_reg.pc - 1,
                     opcode, high, low, data);
     m_reg.pc = m_reg.pc + 2;
-    m_bus.write_byte(data, m_reg.a);
+    m_bus[data] = m_reg.a;
 }
 
 void Sm83OpcodeRunner::ldh_a_c(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LDH A, (C)", m_reg.pc - 1, opcode);
-    m_reg.a = m_bus.read_byte((m_reg.c << 8) | 0xFF);
+    m_reg.a = m_bus[(m_reg.c << 8) | 0xFF];
 }
 
 void Sm83OpcodeRunner::ldh_c_a(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LDH (C), A", m_reg.pc - 1, opcode);
-    m_bus.write_byte((m_reg.c << 8) | 0xFF, m_reg.a);
+    m_bus[(m_reg.c << 8) | 0xFF] = m_reg.a;
 }
 
 void Sm83OpcodeRunner::ldh_n_a(uint8_t opcode)
 {
-    uint8_t offset = m_bus.read_byte(m_reg.pc);
+    uint8_t offset = m_bus[m_reg.pc];
     m_logger->debug("Run: [{0:04X} -> {1:02X} {2:02X}] LDH ({2:02X}) A", m_reg.pc - 1, opcode,
                     offset);
     ++m_reg.pc;
-    m_bus.write_byte((offset << 8) | 0xFF, m_reg.a);
+    m_bus[(offset << 8) | 0xFF] = m_reg.a;
 }
 
 void Sm83OpcodeRunner::ld_a_hlm(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD A, (HL-)", m_reg.pc - 1, opcode);
-    m_reg.a = m_bus.read_byte(m_reg.hl);
+    m_reg.a = m_bus[m_reg.hl];
     --m_reg.hl;
 }
 
 void Sm83OpcodeRunner::ld_hlm_a(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD (HL-), A", m_reg.pc - 1, opcode);
-    m_bus.write_byte(m_reg.hl, m_reg.a);
+    m_bus[m_reg.hl] = m_reg.a;
     --m_reg.hl;
 }
 
 void Sm83OpcodeRunner::ld_a_hlp(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD A, (HL+)", m_reg.pc - 1, opcode);
-    m_reg.a = m_bus.read_byte(m_reg.hl);
+    m_reg.a = m_bus[m_reg.hl];
     ++m_reg.hl;
 }
 
 void Sm83OpcodeRunner::ld_hlp_a(uint8_t opcode)
 {
     m_logger->debug("Run: [{0:04X} -> {1:02X}] LD (HL+), A", m_reg.pc - 1, opcode);
-    m_bus.write_byte(m_reg.hl, m_reg.a);
-    --m_reg.hl;
+    m_bus[m_reg.hl] = m_reg.a;
     ++m_reg.hl;
 }
 
@@ -206,7 +205,7 @@ Sm83::Sm83(std::shared_ptr<spdlog::logger> logger, MemoryBus& bus)
 void Sm83::step()
 {
     // Fetch opcode...
-    uint8_t opcode = m_bus.read_byte(m_reg.pc);
+    uint8_t opcode = m_bus[m_reg.pc];
     ++m_reg.pc;
 
     // Decode and execute opcode...
