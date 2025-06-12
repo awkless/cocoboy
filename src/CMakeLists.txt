@@ -9,6 +9,7 @@ add_library(emu
   "${CMAKE_CURRENT_SOURCE_DIR}/cocoboy/soc/memory.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/cocoboy/soc/cpu.cpp")
 target_include_directories(emu PUBLIC "${CMAKE_SOURCE_DIR}/src")
+target_link_libraries(emu PRIVATE cocoboy::deps)
 add_library(cocoboy::emu ALIAS emu)
 
 add_executable(cocoboy_bin)
