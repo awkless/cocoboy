@@ -98,20 +98,12 @@ public:
     /// @brief Prefix increment.
     ///
     /// @return Return incremented self.
-    Register& operator++()
-    {
-        m_data = m_data + 1;
-        return *this;
-    }
+    Register& operator++() { return *this = *this + 1; }
 
     /// @brief Prefix decrement.
     ///
     /// @return Return decremented self.
-    Register& operator--()
-    {
-        m_data = m_data - 1;
-        return *this;
-    }
+    Register& operator--() { return *this = *this - 1; }
 
 private:
     /// Data held in register.
@@ -170,7 +162,6 @@ public:
     /// @brief Assign data into register pair.
     RegisterPair& operator=(P data)
     {
-        constexpr unsigned int shift = std::numeric_limits<P>::digits / 2;
         m_high = static_cast<T>(data >> shift);
         m_low = static_cast<T>(data);
         return *this;
@@ -179,20 +170,35 @@ public:
     /// @brief Implicitly convert register pair to target type.
     ///
     /// @return Data of register pair as target type.
-    operator P() const
+    operator P() const { return static_cast<P>((m_high << shift) | m_low); }
+
+    RegisterPair& operator--()
     {
-        constexpr unsigned int shift = std::numeric_limits<P>::digits / 2;
-        return static_cast<P>((m_high << shift) | m_low);
+        uint16_t pair = *this;
+        --pair;
+        *this = pair;
+        return *this;
+    }
+
+    RegisterPair& operator++()
+    {
+        uint16_t pair = *this;
+        ++pair;
+        *this = pair;
+        return *this;
     }
 
 private:
+    /// Shift amount for bits.
+    static constexpr unsigned int shift = std::numeric_limits<P>::digits / 2;
+
     /// High portion of register pair (r1).
     Register<T>& m_high;
 
     /// Low portion of register pair (r2).
     Register<T>& m_low;
 };
-}  // namespace cocoboy
+}  // namespace cocoboy::soc
 
 namespace fmt {
 template <typename T>

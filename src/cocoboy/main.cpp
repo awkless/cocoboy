@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "cocoboy/config.hpp"
-#include "cocoboy/soc/cpu.hpp"
-#include "cocoboy/soc/memory.hpp"
 
 #include <SDL3/SDL.h>
 #include <imgui.h>
@@ -42,8 +40,6 @@ try {
     logger->warn("This is a simple warning message");
     logger->error("This is a simple error message");
     logger->critical("This is a simple critical error message");
-    cocoboy::soc::MemoryBus memory(logger);
-    cocoboy::soc::Sm83(logger, memory);
 
     constexpr int winWidth = 600;
     constexpr int winHeight = 400;

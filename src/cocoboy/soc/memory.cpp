@@ -24,4 +24,4 @@ void MemoryBus::write_byte(uint16_t address, uint8_t byte)
     m_logger->debug("Write 0x{0:02X} to address 0x{1:04X}", byte, address);
     m_ram[address] = byte;
 }
-}  // namespace cocoboy
+}  // namespace cocoboy::soc

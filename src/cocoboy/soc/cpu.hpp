@@ -8,10 +8,10 @@
 
 #include <fmt/format.h>
 #include <spdlog/logger.h>
+#include <array>
 #include <cstdint>
 #include <limits>
 #include <memory>
-#include <array>
 
 namespace cocoboy::soc {
 /// @brief SM83 register file representation.
@@ -75,75 +75,75 @@ struct Sm83RegisterFile final {
     /// Program counter register.
     Register<uint16_t> pc;
 
-    std::array<Register<uint8_t>*, 8> r8 = { &b, &c, &d, &e, &h, &l, &a };
+    /// Array of 8-bit register file to simplify decoding by register ID.
+    std::array<Register<uint8_t>*, 8> r8 = {&b, &c, &d, &e, &h, &l, &f, &a};
 };
 
-enum Sm83Opcode : uint8_t
-{
+enum Sm83Opcode : uint8_t {
     // Misc.
-    NOP     = 0x00,
-    HALT    = 0x76,
-    STOP    = 0x10,
+    NOP = 0x00,
+    HALT = 0x76,
+    STOP = 0x10,
 
     // LD R, R'
-    LD_B_B  = 0x40,
-    LD_B_C  = 0x41,
-    LD_B_D  = 0x42,
-    LD_B_E  = 0x43,
-    LD_B_H  = 0x44,
-    LD_B_L  = 0x45,
-    LD_B_A  = 0x47,
-    LD_C_B  = 0x48,
-    LD_C_C  = 0x49,
-    LD_C_D  = 0x4A,
-    LD_C_E  = 0x4B,
-    LD_C_H  = 0x4C,
-    LD_C_L  = 0x4D,
-    LD_C_A  = 0x4F,
-    LD_D_B  = 0x50,
-    LD_D_C  = 0x51,
-    LD_D_D  = 0x52,
-    LD_D_E  = 0x53,
-    LD_D_H  = 0x54,
-    LD_D_L  = 0x55,
-    LD_D_A  = 0x57,
-    LD_E_B  = 0x58,
-    LD_E_C  = 0x59,
-    LD_E_D  = 0x5A,
-    LD_E_E  = 0x5B,
-    LD_E_H  = 0x5C,
-    LD_E_L  = 0x5D,
-    LD_E_A  = 0x5F,
-    LD_H_B  = 0x60,
-    LD_H_C  = 0x61,
-    LD_H_D  = 0x62,
-    LD_H_E  = 0x63,
-    LD_H_H  = 0x64,
-    LD_H_L  = 0x65,
-    LD_H_A  = 0x67,
-    LD_L_B  = 0x68,
-    LD_L_C  = 0x69,
-    LD_L_D  = 0x6A,
-    LD_L_E  = 0x6B,
-    LD_L_H  = 0x6C,
-    LD_L_L  = 0x6D,
-    LD_L_A  = 0x6F,
-    LD_A_B  = 0x78,
-    LD_A_C  = 0x79,
-    LD_A_D  = 0x7A,
-    LD_A_E  = 0x7B,
-    LD_A_H  = 0x7C,
-    LD_A_L  = 0x7D,
-    LD_A_A  = 0x7F,
+    LD_B_B = 0x40,
+    LD_B_C = 0x41,
+    LD_B_D = 0x42,
+    LD_B_E = 0x43,
+    LD_B_H = 0x44,
+    LD_B_L = 0x45,
+    LD_B_A = 0x47,
+    LD_C_B = 0x48,
+    LD_C_C = 0x49,
+    LD_C_D = 0x4A,
+    LD_C_E = 0x4B,
+    LD_C_H = 0x4C,
+    LD_C_L = 0x4D,
+    LD_C_A = 0x4F,
+    LD_D_B = 0x50,
+    LD_D_C = 0x51,
+    LD_D_D = 0x52,
+    LD_D_E = 0x53,
+    LD_D_H = 0x54,
+    LD_D_L = 0x55,
+    LD_D_A = 0x57,
+    LD_E_B = 0x58,
+    LD_E_C = 0x59,
+    LD_E_D = 0x5A,
+    LD_E_E = 0x5B,
+    LD_E_H = 0x5C,
+    LD_E_L = 0x5D,
+    LD_E_A = 0x5F,
+    LD_H_B = 0x60,
+    LD_H_C = 0x61,
+    LD_H_D = 0x62,
+    LD_H_E = 0x63,
+    LD_H_H = 0x64,
+    LD_H_L = 0x65,
+    LD_H_A = 0x67,
+    LD_L_B = 0x68,
+    LD_L_C = 0x69,
+    LD_L_D = 0x6A,
+    LD_L_E = 0x6B,
+    LD_L_H = 0x6C,
+    LD_L_L = 0x6D,
+    LD_L_A = 0x6F,
+    LD_A_B = 0x78,
+    LD_A_C = 0x79,
+    LD_A_D = 0x7A,
+    LD_A_E = 0x7B,
+    LD_A_H = 0x7C,
+    LD_A_L = 0x7D,
+    LD_A_A = 0x7F,
 
     // LD R, N
-    LD_B_N  = 0x06,
-    LD_C_N  = 0x0E,
-    LD_D_N  = 0x16,
-    LD_E_N  = 0x1E,
-    LD_H_N  = 0x26,
-    LD_L_N  = 0x2E,
-    LD_A_N  = 0x3E,
+    LD_B_N = 0x06,
+    LD_C_N = 0x0E,
+    LD_D_N = 0x16,
+    LD_E_N = 0x1E,
+    LD_H_N = 0x26,
+    LD_L_N = 0x2E,
+    LD_A_N = 0x3E,
 
     // LD R, (HL)
     LD_B_HL = 0x46,
@@ -165,6 +165,148 @@ enum Sm83Opcode : uint8_t
 
     // LD (HL) N
     LD_HL_N = 0x36,
+
+    // LD A, (BC)
+    LD_A_BC = 0x0A,
+
+    // LD A, (DE)
+    LD_A_DE = 0x1A,
+
+    // LD (BC), A
+    LD_BC_A = 0x02,
+
+    // LD (DE), A
+    LD_DE_A = 0x12,
+
+    // LD A, (NN)
+    LD_A_NN = 0xFA,
+
+    // LD (NN), A
+    LD_NN_A = 0xEA,
+
+    // LDH A, (C)
+    LDH_A_C = 0xF2,
+
+    // LDH (C), A
+    LDH_C_A = 0xE2,
+
+    // LDH A, (N)
+    LDH_A_N = 0xF0,
+
+    // LDH (N), A
+    LDH_N_A = 0xE0,
+
+    // LD A, (HL-)
+    LD_A_HLM = 0x3A,
+
+    // LD (HL-), A
+    LD_HLM_A = 0x32,
+
+    // LD A, (HL+)
+    LD_A_HLP = 0x2A,
+
+    // LD (HL+), A
+    LD_HLP_A = 0x22,
+};
+
+class Sm83OpcodeRunner final {
+public:
+    /// @brief Construct new opcode runner instance.
+    ///
+    /// @param logger Logger to log internal state.
+    /// @param reg Register file to use.
+    /// @param bus Memory bus to use.
+    ///
+    /// @return Instance of opcode runner.
+    Sm83OpcodeRunner(std::shared_ptr<spdlog::logger> logger, Sm83RegisterFile& reg, MemoryBus& bus);
+
+    /// @brief LD r, r': Load register (register).
+    ///
+    /// Load to 8-bit register __r__ with data from 8-bit register __r'__.
+    ///
+    /// - Opcode: 0b01xxxyyy
+    /// - Length: 1 byte
+    /// - Duration: 1m cycle
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
+    void ld_r_r(uint8_t opcode);
+
+    /// @brief LD r, n: Load register (immediate).
+    ///
+    /// Load to 8-bit register __r__ with 8-bit immediate data __n__.
+    ///
+    /// - Opcode: 0b00xxx110
+    /// - Length: 2 bytes
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
+    void ld_r_n(uint8_t opcode);
+
+    /// @brief LD r, (HL): Load register (indirect HL).
+    ///
+    /// Load to 8-bit register __r__ with data from the absolute address specified by __HL__
+    /// register.
+    ///
+    /// - Opcode: 0b01xxx110
+    /// - Length: 1 bytes
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
+    void ld_r_hl(uint8_t opcode);
+
+    /// @brief LD (HL), r: Load from register (indirect HL).
+    ///
+    /// Load to the absolute address specified by the 16-bit register __HL__ with data from 8-bit
+    /// register __r__.
+    ///
+    /// - Opcode: 0b01110xxx
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
+    void ld_hl_r(uint8_t opcode);
+
+    /// @brief LD (HL), n: Load from immediate data (indirect HL).
+    ///
+    /// Load to the absolute address specified by the 16-bit register __HL__ with immediate data
+    /// __n__.
+    ///
+    /// - Opcode: 0b00110110
+    /// - Length: 2 byte
+    /// - Duration: 3m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
+    void ld_hl_n(uint8_t opcode);
+
+    void ld_a_bc(uint8_t opcode);
+    void ld_a_de(uint8_t opcode);
+    void ld_bc_a(uint8_t opcode);
+    void ld_de_a(uint8_t opcode);
+    void ld_a_nn(uint8_t opcode);
+    void ld_nn_a(uint8_t opcode);
+    void ldh_a_c(uint8_t opcode);
+    void ldh_c_a(uint8_t opcode);
+    void ldh_a_n(uint8_t opcode);
+    void ldh_n_a(uint8_t opcode);
+    void ld_a_hlm(uint8_t opcode);
+    void ld_hlm_a(uint8_t opcode);
+    void ld_a_hlp(uint8_t opcode);
+    void ld_hlp_a(uint8_t opcode);
+
+private:
+    /// Logger to log internal state for debugging.
+    std::shared_ptr<spdlog::logger> m_logger;
+
+    /// Register file for CPU.
+    Sm83RegisterFile& m_reg;
+
+    /// Memory bus to send and receive computations from instruction set.
+    MemoryBus& m_bus;
 };
 
 /// @brief Implementation of SM83 CPU for GameBoy SoC.
@@ -187,11 +329,13 @@ public:
     /// @return New SM83 CPU instance.
     Sm83(std::shared_ptr<spdlog::logger> logger, MemoryBus& bus);
 
-    void execute();
+    /// @brief Execute instruction pointed to by PC register.
+    ///
+    /// Performs the fetch, decode, and execute cycle of the SM83 CPU for one instruction that the
+    /// PC register is pointing to in memory.
+    void step();
 
 private:
-    void ld_r_r(uint8_t opcode);
-
     /// Logger to log internal state for debugging.
     std::shared_ptr<spdlog::logger> m_logger;
 
@@ -200,7 +344,10 @@ private:
 
     /// Memory bus to send and receive computations from instruction set.
     MemoryBus& m_bus;
+
+    /// Opcode implementations to execute after decoding.
+    Sm83OpcodeRunner m_opcode;
 };
-}  // namespace cocoboy
+}  // namespace cocoboy::soc
 
 #endif  // COCOBOY_SOC_CPU_HPP

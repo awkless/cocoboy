@@ -187,7 +187,8 @@ if(ENABLE_CLANG_TIDY)
       -checks=-*,clang-diagnostic-*,clang-analyzer-*,bugprone-*,modernize-*
       -checks=-modernize-use-trailing-return-type,portability-*,performance-*
       -checks=-modernize-avoid-c-arrays
-      -checks=readability-*,-readability-braces-around-statements)
+      -checks=readability-*,-readability-braces-around-statements
+      -checks=-readability-magic-numbers)
 
     if(MSVC)
       set(CMAKE_CXX_CLANG_TIDY
