@@ -65,3 +65,41 @@ TEST_CASE("RegisterPair& RegisterPair::operator P() const", "[register_pair]")
     uint16_t val = reg_pair;
     REQUIRE(val == 0x1234); // NOLINT
 }
+
+TEST_CASE("RegisterPair& RegisterPair::operator++()", "[register_pair]")
+{
+    cocoboy::soc::Register<uint8_t> reg1(0x00);
+    cocoboy::soc::Register<uint8_t> reg2(0x00);
+    cocoboy::soc::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+
+    ++reg_pair;
+    REQUIRE(reg_pair == 0x0001);
+
+    reg1 = 0x01;
+    reg2 = 0xFF;
+    ++reg_pair;
+    REQUIRE(reg_pair == 0x0200);
+
+    reg_pair = 0x0100;
+    ++reg_pair;
+    REQUIRE(reg_pair == 0x0101);
+}
+
+TEST_CASE("RegisterPair& RegisterPair::operator--()", "[register_pair]")
+{
+    cocoboy::soc::Register<uint8_t> reg1(0x00);
+    cocoboy::soc::Register<uint8_t> reg2(0x01);
+    cocoboy::soc::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+
+    --reg_pair;
+    REQUIRE(reg_pair == 0x0000);
+
+    reg1 = 0x01;
+    reg2 = 0xFF;
+    --reg_pair;
+    REQUIRE(reg_pair == 0x01FE);
+
+    reg_pair = 0x0100;
+    --reg_pair;
+    REQUIRE(reg_pair == 0x00FF);
+}

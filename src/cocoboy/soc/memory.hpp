@@ -164,21 +164,16 @@ public:
     /// @return Data of register pair as target type.
     operator P() const { return static_cast<P>((m_high << shift) | m_low); }
 
-    RegisterPair& operator--()
-    {
-        uint16_t pair = *this;
-        --pair;
-        *this = pair;
-        return *this;
+    RegisterPair& operator++() {
+        P data = static_cast<P>(*this);
+        return *this = ++data;
     }
 
-    RegisterPair& operator++()
-    {
-        uint16_t pair = *this;
-        ++pair;
-        *this = pair;
-        return *this;
+    RegisterPair& operator--() {
+        P data = static_cast<P>(*this);
+        return *this = --data;
     }
+
 
 private:
     /// Shift amount for bits.
