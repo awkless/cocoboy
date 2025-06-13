@@ -79,7 +79,7 @@ struct RegisterFile final {
     std::array<Register<uint8_t>*, 8> r8 = {&b, &c, &d, &e, &h, &l, &f, &a};
 };
 
-enum Sm83Opcode : uint8_t {
+enum OpcodeKind : uint8_t {
     // Misc.
     NOP = 0x00,
     HALT = 0x76,
@@ -209,7 +209,7 @@ enum Sm83Opcode : uint8_t {
     LD_HLP_A = 0x22,
 };
 
-class Sm83OpcodeRunner final {
+class Opcode final {
 public:
     /// @brief Construct new opcode runner instance.
     ///
@@ -218,7 +218,7 @@ public:
     /// @param bus Memory bus to use.
     ///
     /// @return Instance of opcode runner.
-    Sm83OpcodeRunner(std::shared_ptr<spdlog::logger> logger, RegisterFile& reg, MemoryBus& bus);
+    Opcode(std::shared_ptr<spdlog::logger> logger, RegisterFile& reg, MemoryBus& bus);
 
     /// @brief LD r, r': Load register (register).
     ///
@@ -283,19 +283,180 @@ public:
     /// @param opcode Fetched and decoded opcode to process.
     void ld_hl_n(uint8_t opcode);
 
+    /// @brief LD A, (BC): Load accumulator (indirect BC).
+    ///
+    /// Load to 8-bit A register, data from absolute address specified by 16-bit register BC.
+    ///
+    /// - Opcode: 0b00001010
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ld_a_bc(uint8_t opcode);
+
+    /// @brief LD A, (DE): Load accumulator (indirect DE).
+    ///
+    /// Load to 8-bit A register, data from absolute address specified by 16-bit register DE.
+    ///
+    /// - Opcode: 0b00011010
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ld_a_de(uint8_t opcode);
+
+    /// @brief LD (BC), A: Load from accumulator (indirect BC).
+    ///
+    /// Load to the absolute address specified by 16-bit register BC, data from 8-bit A register.
+    ///
+    /// - Opcode: 0b00000010
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ld_bc_a(uint8_t opcode);
+
+    /// @brief LD (DE), A: Load from accumulator (indirect DE).
+    ///
+    /// Load to the absolute address specified by 16-bit register DE, data from 8-bit A register.
+    ///
+    /// - Opcode: 0b00010010
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ld_de_a(uint8_t opcode);
+
+    /// @brief LD A, (NN): Load accumulator (direct).
+    ///
+    /// Load to 8-bit A register, data from absolute address specified by 16-bit operand NN.
+    ///
+    /// - Opcode: 0b11111010
+    /// - Length: 3 byte
+    /// - Duration: 4m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ld_a_nn(uint8_t opcode);
+
+    /// @brief LD (NN), A: Load from accumulator (direct).
+    ///
+    /// Load to absolute address specified by 16-bit operand NN, data from the 8-bit A register.
+    ///
+    /// - Opcode: 0b11101010
+    /// - Length: 3 byte
+    /// - Duration: 4m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ld_nn_a(uint8_t opcode);
+
+    /// @brief LDH A, (C): Load accumulator (indirect 0xFF00 + C).
+    ///
+    /// Load to 8-bit A register, data from addrss specified by the 8-bit C register as an offset
+    /// from address 0xFF00. Possible range is 0xFF00 - 0xFFFF inclusive.
+    ///
+    /// - Opcode: 0b11110010
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ldh_a_c(uint8_t opcode);
+
+    /// @brief LDH (C), A: Load from accumulator (indirect 0xFF00 + C).
+    ///
+    /// Load to address specified by the 8-bit C register as an offset of 0xFF00, data from 8-bit
+    /// A register. Possible range is 0xFF00 - 0xFFFF inclusive.
+    ///
+    /// - Opcode: 0b11100010
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ldh_c_a(uint8_t opcode);
+
+    /// @brief LDH A, (N): Load accumulator (direct 0xFF00 + N).
+    ///
+    /// Load to 8-bit register A, data from the address specified by 8-bit immediate data N as an
+    /// offset of 0xFF00. Possible range is 0xFF00 - 0xFFFF inclusive.
+    ///
+    /// - Opcode: 0b11110000
+    /// - Length: 2 byte
+    /// - Duration: 3m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ldh_a_n(uint8_t opcode);
+
+    /// @brief LDH (N), A: Load from accumulator (direct 0xFF00 + N).
+    ///
+    /// Load to address specified by the 8-bit immediate data as an offset of 0xFF00, data from
+    /// the 8-bit A register. Possible range is 0xFF00 - 0xFFFF inclusive.
+    ///
+    /// - Opcode: 0b11100000
+    /// - Length: 2 byte
+    /// - Duration: 3m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ldh_n_a(uint8_t opcode);
+
+    /// @brief LD A, (HL-): Load accumulator (indirect HL, decrement).
+    ///
+    /// Load to 8-bit A register, data from the absolute addrss specified by the 16-bit register
+    /// HL. The value of HL is decremented after the memory read.
+    ///
+    /// - Opcode: 0b00111010
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ld_a_hlm(uint8_t opcode);
+
+    /// @brief LD (HL-), A: Load from accumulator (indirect HL, decrement).
+    ///
+    /// Load to absolute address specified by 16-bit register HL, data form 8-bit A register.
+    /// The value of HL is decremented after the memory write.
+    ///
+    /// - Opcode: 0b00110010
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ld_hlm_a(uint8_t opcode);
+
+    /// @brief LD A, (HL+): Load accumulator (indirect HL, increment).
+    ///
+    /// Load to 8-bit A register, data from the absolute address specified by the 16-bit regster
+    /// HL. The value of HL is incremented after the memory read.
+    ///
+    /// - Opcode: 0b00101010
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ld_a_hlp(uint8_t opcode);
+
+    /// @brief LD (HL+), A: Load from accumulator (indirect HL, increment).
+    ///
+    /// Load to the absolute addrss specified by the 16-bit register HL, data from the 8-bit A
+    /// register. The value of HL is decremented after the memory write.
+    ///
+    /// - Opcode: 0b00100010
+    /// - Length: 1 byte
+    /// - Duration: 2m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
     void ld_hlp_a(uint8_t opcode);
 
 private:
@@ -346,7 +507,7 @@ private:
     MemoryBus& m_bus;
 
     /// Opcode implementations to execute after decoding.
-    Sm83OpcodeRunner m_opcode;
+    Opcode m_run;
 };
 }  // namespace cocoboy::soc
 

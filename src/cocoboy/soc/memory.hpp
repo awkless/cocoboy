@@ -32,8 +32,16 @@ public:
     /// @return Newly constructed memory bus.
     explicit MemoryBus(std::shared_ptr<spdlog::logger> logger);
 
+    /// @brief Immutable memory access.
+    ///
+    /// @param address Addess to access data from.
+    /// @return Immutable data from target address.
     const uint8_t& operator[](uint16_t address) const;
 
+    /// @brief Mutable memory access.
+    ///
+    /// @param addrss Address to access data from.
+    /// @return Mutable data from target address.
     uint8_t& operator[](uint16_t address);
 
 private:
@@ -164,16 +172,23 @@ public:
     /// @return Data of register pair as target type.
     operator P() const { return static_cast<P>((m_high << shift) | m_low); }
 
-    RegisterPair& operator++() {
+    /// @brief Prefix increment register pair.
+    ///
+    /// @return Prefix incremented self.
+    RegisterPair& operator++()
+    {
         P data = static_cast<P>(*this);
         return *this = ++data;
     }
 
-    RegisterPair& operator--() {
+    /// @brief Prefix decrement register pair.
+    ///
+    /// @return Prefix decremented self.
+    RegisterPair& operator--()
+    {
         P data = static_cast<P>(*this);
         return *this = --data;
     }
-
 
 private:
     /// Shift amount for bits.
