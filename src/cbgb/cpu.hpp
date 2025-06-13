@@ -4,14 +4,15 @@
 #ifndef CBGB_CPU_HPP
 #define CBGB_CPU_HPP
 
-#include "cbgb/memory.hpp"
-
-#include <fmt/format.h>
-#include <spdlog/logger.h>
 #include <array>
 #include <cstdint>
 #include <limits>
 #include <memory>
+
+#include <fmt/format.h>
+#include <spdlog/logger.h>
+
+#include "cbgb/memory.hpp"
 
 namespace cbgb::cpu {
 /// @brief SM83 register file representation.
@@ -75,7 +76,7 @@ struct RegisterFile final {
     /// Program counter register.
     cbgb::memory::Register<uint16_t> pc;
 
-    std::array<cbgb::memory::Register<uint8_t>*, 8> r8 = {&b, &c, &d, &e, &h, &l, &f, &a};
+    std::array<cbgb::memory::Register<uint8_t>*, 8> r8 = { &b, &c, &d, &e, &h, &l, &f, &a };
 };
 
 enum OpcodeKind : uint8_t {
@@ -464,7 +465,6 @@ public:
     /// @param opcode Fetched and decoded opcode to process.
     void ld_hlp_a(uint8_t opcode);
 
-
     /// @brief LD rr, nn: Load 16-bit register pair.
     ///
     /// Load to 16-bit register __rr__ to the immediate 16-bit data __nn__.
@@ -476,6 +476,7 @@ public:
     ///
     /// @param opcode Fetched and decoded opcode to process.
     void ld_rr_nn(uint8_t opcode);
+
 private:
     /// Logger to log internal state for debugging.
     std::shared_ptr<spdlog::logger> m_logger;
@@ -526,6 +527,6 @@ private:
     /// Opcode implementations to execute after decoding.
     Opcode m_run;
 };
-}  // namespace cbgb::cpu
+} // namespace cbgb::cpu
 
-#endif  // CBGB_CPU_HPP
+#endif // CBGB_CPU_HPP

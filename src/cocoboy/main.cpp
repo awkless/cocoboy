@@ -1,38 +1,40 @@
 // SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
 // SPDX-License-Identifier: MIT
 
-#include "cocoboy/config.hpp"
+#include <exception>
+#include <memory>
 
 #include <SDL3/SDL.h>
+#include <cxxopts.hpp>
 #include <imgui.h>
 #include <imgui/backends/imgui_impl_sdl3.h>
 #include <imgui/backends/imgui_impl_sdlrenderer3.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
-#include <cxxopts.hpp>
 
-#include <exception>
-#include <memory>
+#include "cocoboy/config.hpp"
 
 int main(int argc, char** argv)
 try {
-    std::unique_ptr<cxxopts::Options> parser =
-        std::make_unique<cxxopts::Options>(argv[0], "- testing");
+    std::unique_ptr<cxxopts::Options> parser
+        = std::make_unique<cxxopts::Options>(argv[0], "- testing");
     bool version = false;
     constexpr size_t max_width = 90;
     auto& options = *parser;
-    options.set_width(max_width).set_tab_expansion().add_options()("v,version", "version info",
-                                                                   cxxopts::value<bool>(version));
+    options.set_width(max_width).set_tab_expansion().add_options()(
+        "v,version", "version info", cxxopts::value<bool>(version)
+    );
     auto result = options.parse(argc, argv);
 
-    if (result.count("version") != 0U)
+    if (result.count("version") != 0U) {
         fmt::print("{}\n", cocoboy::PROGRAM_VERSION);
+    }
 
     fmt::print("{} {}\n", cocoboy::PROGRAM_NAME, cocoboy::PROGRAM_VERSION);
     fmt::print("{}\n\n", cocoboy::PROGRAM_DESCRIPTION);
 
-    std::shared_ptr<spdlog::logger> logger =
-        spdlog::stdout_color_mt(cocoboy::PROGRAM_NAME.data());  // NOLINT
+    std::shared_ptr<spdlog::logger> logger
+        = spdlog::stdout_color_mt(cocoboy::PROGRAM_NAME.data()); // NOLINT
     logger->set_level(spdlog::level::trace);
     logger->info("This is a simple info message");
     logger->trace("This is a simple trace message");
@@ -74,7 +76,7 @@ try {
         ImGui::End();
 
         ImGui::Render();
-        SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);  // NOLINT
+        SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255); // NOLINT
         SDL_RenderClear(renderer);
         ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
         SDL_RenderPresent(renderer);
@@ -89,13 +91,16 @@ try {
     SDL_Quit();
 
     return 0;
-} catch (const spdlog::spdlog_ex& error) {
+}
+catch (const spdlog::spdlog_ex& error) {
     fmt::print("{}\n", error.what());
     return 1;
-} catch (const cxxopts::exceptions::exception& error) {
+}
+catch (const cxxopts::exceptions::exception& error) {
     fmt::print("{}\n", error.what());
     return 1;
-} catch (const std::exception& error) {
+}
+catch (const std::exception& error) {
     fmt::print("{}\n", error.what());
     return 1;
 }

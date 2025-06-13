@@ -4,11 +4,12 @@
 #ifndef CBGB_MEMORY_HPP
 #define CBGB_MEMORY_HPP
 
-#include <spdlog/spdlog.h>
 #include <array>
 #include <cstdint>
 #include <limits>
 #include <memory>
+
+#include <spdlog/spdlog.h>
 
 namespace cbgb::memory {
 /// @brief Shared physical system memory.
@@ -63,50 +64,36 @@ public:
     /// @brief Construct new register with initial state.
     ///
     /// @return New instance of register.
-    explicit Register(T initial) : m_data(initial) {}
+    explicit Register(T initial)
+        : m_data(initial)
+    {
+    }
 
-    /// @brief Assign data into register.
     Register& operator=(T data)
     {
         m_data = data;
         return *this;
     }
 
-    /// @brief Implicitly convert register to target type.
-    ///
-    /// @return Register data converted into target type.
     operator T() const { return static_cast<T>(m_data); }
 
-    /// @brief Assign data through AND mask.
-    ///
-    /// @return Return AND masked self.
     Register& operator&=(T val)
     {
         m_data &= val;
         return *this;
     }
 
-    /// @brief Assign data through OR mask.
-    ///
-    /// @return Return OR masked self.
     Register& operator|=(T val)
     {
         m_data |= val;
         return *this;
     }
 
-    /// @brief Prefix increment.
-    ///
-    /// @return Return incremented self.
     Register& operator++() { return *this = *this + 1; }
 
-    /// @brief Prefix decrement.
-    ///
-    /// @return Return decremented self.
     Register& operator--() { return *this = *this - 1; }
 
 private:
-    /// Data held in register.
     T m_data;
 };
 
@@ -115,7 +102,10 @@ template <unsigned int bitno, unsigned int nbits, typename T = uint8_t>
 class RegisterBit final {
 public:
     /// @brief Construct new register bit controller.
-    explicit RegisterBit(Register<T>& reg) : m_reg(reg) {}
+    explicit RegisterBit(Register<T>& reg)
+        : m_reg(reg)
+    {
+    }
 
     /// @brief Assign value into bits of register.
     ///
@@ -133,10 +123,7 @@ public:
     operator T() const { return (m_reg >> bitno) & mask; }
 
 private:
-    /// Mask for extracting register bits.
     static constexpr T mask = (T(1) << nbits) - T(1);
-
-    /// Register to set bits inside of.
     Register<T>& m_reg;
 };
 
@@ -151,12 +138,16 @@ public:
     /// @brief Construct new register pair through target register types.
     ///
     /// @return Newly constructed instance of register pair.
-    RegisterPair(Register<T>& high, Register<T>& low) : m_high(high), m_low(low)
+    RegisterPair(Register<T>& high, Register<T>& low)
+        : m_high(high)
+        , m_low(low)
     {
         constexpr unsigned int max_bits = std::numeric_limits<P>::digits;
         constexpr unsigned int pair_bits = std::numeric_limits<T>::digits * 2;
-        static_assert(max_bits == pair_bits,
-                      "invalid bit length, need r1 bit length + r2 bit length = rp bit length");
+        static_assert(
+            max_bits == pair_bits,
+            "invalid bit length, need r1 bit length + r2 bit length = rp bit length"
+        );
     }
 
     /// @brief Assign data into register pair.
@@ -191,16 +182,11 @@ public:
     }
 
 private:
-    /// Shift amount for bits.
     static constexpr unsigned int shift = std::numeric_limits<P>::digits / 2;
-
-    /// High portion of register pair (r1).
     Register<T>& m_high;
-
-    /// Low portion of register pair (r2).
     Register<T>& m_low;
 };
-}  // namespace cbgb::memory
+} // namespace cbgb::memory
 
 namespace fmt {
 template <typename T>
@@ -229,6 +215,6 @@ struct formatter<cbgb::memory::RegisterPair<P, T>> : formatter<T> {
         return format_to(ctx.out(), "0x{:X}", static_cast<P>(reg));
     }
 };
-}  // namespace fmt
+} // namespace fmt
 
-#endif  // CBGB_MEMORY_HPP
+#endif // CBGB_MEMORY_HPP
