@@ -1,17 +1,17 @@
 // SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
 // SPDX-License-Identifier: MIT
 
-#include "cocoboy/soc/memory.hpp"
+#include "cbgb/memory.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <cstdint>
 
 TEST_CASE("RegisterBit& RegisterBit::operator=(T val)", "[register_bit]")
 {
-    cocoboy::soc::Register<uint8_t> reg(0x00);
-    cocoboy::soc::RegisterBit<0, 1, uint8_t> bit1(reg);
-    cocoboy::soc::RegisterBit<1, 3, uint8_t> bit2(reg);
-    cocoboy::soc::RegisterBit<4, 4, uint8_t> bit3(reg);
+    cbgb::memory::Register<uint8_t> reg(0x00);
+    cbgb::memory::RegisterBit<0, 1, uint8_t> bit1(reg);
+    cbgb::memory::RegisterBit<1, 3, uint8_t> bit2(reg);
+    cbgb::memory::RegisterBit<4, 4, uint8_t> bit3(reg);
 
     bit1 = 0x1;
     bit2 = 0x2;
@@ -21,10 +21,10 @@ TEST_CASE("RegisterBit& RegisterBit::operator=(T val)", "[register_bit]")
 
 TEST_CASE("RegisterBit::operator T() const", "[register_bit]")
 {
-    cocoboy::soc::Register<uint8_t> reg(0x00);
-    cocoboy::soc::RegisterBit<0, 1, uint8_t> bit1(reg);
-    cocoboy::soc::RegisterBit<1, 3, uint8_t> bit2(reg);
-    cocoboy::soc::RegisterBit<4, 4, uint8_t> bit3(reg);
+    cbgb::memory::Register<uint8_t> reg(0x00);
+    cbgb::memory::RegisterBit<0, 1, uint8_t> bit1(reg);
+    cbgb::memory::RegisterBit<1, 3, uint8_t> bit2(reg);
+    cbgb::memory::RegisterBit<4, 4, uint8_t> bit3(reg);
 
 
     bit1 = 0x1;
@@ -40,9 +40,9 @@ TEST_CASE("RegisterBit::operator T() const", "[register_bit]")
 
 TEST_CASE("RegisterPair& RegisterPair::operator=(T val)", "[register_pair]")
 {
-    cocoboy::soc::Register<uint8_t> reg1(0x00);
-    cocoboy::soc::Register<uint8_t> reg2(0x00);
-    cocoboy::soc::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+    cbgb::memory::Register<uint8_t> reg1(0x00);
+    cbgb::memory::Register<uint8_t> reg2(0x00);
+    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
     reg_pair = 0xDEAD;
     REQUIRE(reg_pair == 0xDEAD);
@@ -56,9 +56,9 @@ TEST_CASE("RegisterPair& RegisterPair::operator=(T val)", "[register_pair]")
 
 TEST_CASE("RegisterPair& RegisterPair::operator P() const", "[register_pair]")
 {
-    cocoboy::soc::Register<uint8_t> reg1(0x00);
-    cocoboy::soc::Register<uint8_t> reg2(0x00);
-    cocoboy::soc::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+    cbgb::memory::Register<uint8_t> reg1(0x00);
+    cbgb::memory::Register<uint8_t> reg2(0x00);
+    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
     reg1 = 0x12;
     reg2 = 0x34;
@@ -68,9 +68,9 @@ TEST_CASE("RegisterPair& RegisterPair::operator P() const", "[register_pair]")
 
 TEST_CASE("RegisterPair& RegisterPair::operator++()", "[register_pair]")
 {
-    cocoboy::soc::Register<uint8_t> reg1(0x00);
-    cocoboy::soc::Register<uint8_t> reg2(0x00);
-    cocoboy::soc::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+    cbgb::memory::Register<uint8_t> reg1(0x00);
+    cbgb::memory::Register<uint8_t> reg2(0x00);
+    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
     ++reg_pair;
     REQUIRE(reg_pair == 0x0001);
@@ -87,9 +87,9 @@ TEST_CASE("RegisterPair& RegisterPair::operator++()", "[register_pair]")
 
 TEST_CASE("RegisterPair& RegisterPair::operator--()", "[register_pair]")
 {
-    cocoboy::soc::Register<uint8_t> reg1(0x00);
-    cocoboy::soc::Register<uint8_t> reg2(0x01);
-    cocoboy::soc::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+    cbgb::memory::Register<uint8_t> reg1(0x00);
+    cbgb::memory::Register<uint8_t> reg2(0x01);
+    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
     --reg_pair;
     REQUIRE(reg_pair == 0x0000);

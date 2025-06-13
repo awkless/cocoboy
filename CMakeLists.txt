@@ -240,6 +240,7 @@ if (ENABLE_IWYU)
 endif()
 
 # Build project...
+add_subdirectory(data)
 add_subdirectory(src)
 
 # Build testing suite...

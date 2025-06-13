@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
 // SPDX-License-Identifier: MIT
 
-#ifndef COCOBOY_SOC_CPU_HPP
-#define COCOBOY_SOC_CPU_HPP
+#ifndef CBGB_CPU_HPP
+#define CBGB_CPU_HPP
 
-#include "cocoboy/soc/memory.hpp"
+#include "cbgb/memory.hpp"
 
 #include <fmt/format.h>
 #include <spdlog/logger.h>
@@ -13,7 +13,7 @@
 #include <limits>
 #include <memory>
 
-namespace cocoboy::soc {
+namespace cbgb::cpu {
 /// @brief SM83 register file representation.
 struct RegisterFile final {
     /// @brief Construct new register file.
@@ -22,61 +22,60 @@ struct RegisterFile final {
     RegisterFile();
 
     /// Accumulator regsiter.
-    Register<uint8_t> a;
+    cbgb::memory::Register<uint8_t> a;
 
     /// Flags register.
-    Register<uint8_t> f;
+    cbgb::memory::Register<uint8_t> f;
 
     /// Zero flag.
-    RegisterBit<7, 1, uint8_t> f_z;
+    cbgb::memory::RegisterBit<7, 1, uint8_t> f_z;
 
     /// Subtraction flag (BCD).
-    RegisterBit<6, 1, uint8_t> f_n;
+    cbgb::memory::RegisterBit<6, 1, uint8_t> f_n;
 
     /// Half carry flag (BCD).
-    RegisterBit<5, 1, uint8_t> f_h;
+    cbgb::memory::RegisterBit<5, 1, uint8_t> f_h;
 
     /// Carry flag.
-    RegisterBit<4, 1, uint8_t> f_c;
+    cbgb::memory::RegisterBit<4, 1, uint8_t> f_c;
 
     /// General purpse register.
-    Register<uint8_t> b;
+    cbgb::memory::Register<uint8_t> b;
 
     /// General purpse register.
-    Register<uint8_t> c;
+    cbgb::memory::Register<uint8_t> c;
 
     /// General purpse register.
-    Register<uint8_t> d;
+    cbgb::memory::Register<uint8_t> d;
 
     /// General purpse register.
-    Register<uint8_t> e;
+    cbgb::memory::Register<uint8_t> e;
 
     /// High byte of memory address.
-    Register<uint8_t> h;
+    cbgb::memory::Register<uint8_t> h;
 
     /// Low byte of memory address.
-    Register<uint8_t> l;
+    cbgb::memory::Register<uint8_t> l;
 
     /// Accumulator flags special purpose register pair.
-    RegisterPair<uint16_t, uint8_t> af;
+    cbgb::memory::RegisterPair<uint16_t, uint8_t> af;
 
     /// General purpose register pair.
-    RegisterPair<uint16_t, uint8_t> bc;
+    cbgb::memory::RegisterPair<uint16_t, uint8_t> bc;
 
     /// General purpose register pair.
-    RegisterPair<uint16_t, uint8_t> de;
+    cbgb::memory::RegisterPair<uint16_t, uint8_t> de;
 
     /// Memory address reference register pair.
-    RegisterPair<uint16_t, uint8_t> hl;
+    cbgb::memory::RegisterPair<uint16_t, uint8_t> hl;
 
     /// Stack pointer register.
-    Register<uint16_t> sp;
+    cbgb::memory::Register<uint16_t> sp;
 
     /// Program counter register.
-    Register<uint16_t> pc;
+    cbgb::memory::Register<uint16_t> pc;
 
-    /// Array of 8-bit register file to simplify decoding by register ID.
-    std::array<Register<uint8_t>*, 8> r8 = {&b, &c, &d, &e, &h, &l, &f, &a};
+    std::array<cbgb::memory::Register<uint8_t>*, 8> r8 = {&b, &c, &d, &e, &h, &l, &f, &a};
 };
 
 enum OpcodeKind : uint8_t {
@@ -207,6 +206,12 @@ enum OpcodeKind : uint8_t {
 
     // LD (HL+), A
     LD_HLP_A = 0x22,
+
+    // LD rr, nn
+    LD_BC_NN = 0x01,
+    LD_DE_NN = 0x11,
+    LD_HL_NN = 0x21,
+    LD_SP_NN = 0x31,
 };
 
 class Opcode final {
@@ -218,7 +223,7 @@ public:
     /// @param bus Memory bus to use.
     ///
     /// @return Instance of opcode runner.
-    Opcode(std::shared_ptr<spdlog::logger> logger, RegisterFile& reg, MemoryBus& bus);
+    Opcode(std::shared_ptr<spdlog::logger> logger, RegisterFile& reg, cbgb::memory::MemoryBus& bus);
 
     /// @brief LD r, r': Load register (register).
     ///
@@ -459,6 +464,18 @@ public:
     /// @param opcode Fetched and decoded opcode to process.
     void ld_hlp_a(uint8_t opcode);
 
+
+    /// @brief LD rr, nn: Load 16-bit register pair.
+    ///
+    /// Load to 16-bit register __rr__ to the immediate 16-bit data __nn__.
+    ///
+    /// - Opcode: 0b00xx0001
+    /// - Length: 3 byte
+    /// - Duration: 3m cycles
+    /// - Flags: None
+    ///
+    /// @param opcode Fetched and decoded opcode to process.
+    void ld_rr_nn(uint8_t opcode);
 private:
     /// Logger to log internal state for debugging.
     std::shared_ptr<spdlog::logger> m_logger;
@@ -467,7 +484,7 @@ private:
     RegisterFile& m_reg;
 
     /// Memory bus to send and receive computations from instruction set.
-    MemoryBus& m_bus;
+    cbgb::memory::MemoryBus& m_bus;
 };
 
 /// @brief Implementation of SM83 CPU for GameBoy SoC.
@@ -488,7 +505,7 @@ public:
     /// send and receive computations from its instruction set.
     ///
     /// @return New SM83 CPU instance.
-    Sm83(std::shared_ptr<spdlog::logger> logger, MemoryBus& bus);
+    Sm83(std::shared_ptr<spdlog::logger> logger, cbgb::memory::MemoryBus& bus);
 
     /// @brief Execute instruction pointed to by PC register.
     ///
@@ -504,11 +521,11 @@ private:
     RegisterFile m_reg;
 
     /// Memory bus to send and receive computations from instruction set.
-    MemoryBus& m_bus;
+    cbgb::memory::MemoryBus& m_bus;
 
     /// Opcode implementations to execute after decoding.
     Opcode m_run;
 };
-}  // namespace cocoboy::soc
+}  // namespace cbgb::cpu
 
-#endif  // COCOBOY_SOC_CPU_HPP
+#endif  // CBGB_CPU_HPP

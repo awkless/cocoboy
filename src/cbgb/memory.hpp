@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
 // SPDX-License-Identifier: MIT
 
-#ifndef COCOBOY_SOC_MEMORY_HPP
-#define COCOBOY_SOC_MEMORY_HPP
+#ifndef CBGB_MEMORY_HPP
+#define CBGB_MEMORY_HPP
 
 #include <spdlog/spdlog.h>
 #include <array>
@@ -10,7 +10,7 @@
 #include <limits>
 #include <memory>
 
-namespace cocoboy::soc {
+namespace cbgb::memory {
 /// @brief Shared physical system memory.
 ///
 /// Original GameBoy hardware utilizes a 16-bit address bus, and an 8-bit data
@@ -200,35 +200,35 @@ private:
     /// Low portion of register pair (r2).
     Register<T>& m_low;
 };
-}  // namespace cocoboy::soc
+}  // namespace cbgb::memory
 
 namespace fmt {
 template <typename T>
-struct formatter<cocoboy::soc::Register<T>> : formatter<T> {
+struct formatter<cbgb::memory::Register<T>> : formatter<T> {
     template <typename FormatContext>
-    auto format(const cocoboy::soc::Register<T>& reg, FormatContext& ctx) const
+    auto format(const cbgb::memory::Register<T>& reg, FormatContext& ctx) const
     {
         return format_to(ctx.out(), "0x{:X}", static_cast<T>(reg));
     }
 };
 
 template <unsigned int bitno, unsigned int nbits, typename T>
-struct formatter<cocoboy::soc::RegisterBit<bitno, nbits, T>> : formatter<T> {
+struct formatter<cbgb::memory::RegisterBit<bitno, nbits, T>> : formatter<T> {
     template <typename FormatContext>
-    auto format(const cocoboy::soc::RegisterBit<bitno, nbits, T>& reg, FormatContext& ctx) const
+    auto format(const cbgb::memory::RegisterBit<bitno, nbits, T>& reg, FormatContext& ctx) const
     {
         return format_to(ctx.out(), "0x{:X}", static_cast<T>(reg));
     }
 };
 
 template <typename P, typename T>
-struct formatter<cocoboy::soc::RegisterPair<P, T>> : formatter<T> {
+struct formatter<cbgb::memory::RegisterPair<P, T>> : formatter<T> {
     template <typename FormatContext>
-    auto format(const cocoboy::soc::RegisterPair<P, T>& reg, FormatContext& ctx) const
+    auto format(const cbgb::memory::RegisterPair<P, T>& reg, FormatContext& ctx) const
     {
         return format_to(ctx.out(), "0x{:X}", static_cast<P>(reg));
     }
 };
 }  // namespace fmt
 
-#endif  // COCOBOY_SOC_MEMORY_HPP
+#endif  // CBGB_MEMORY_HPP

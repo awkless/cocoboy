@@ -1,10 +1,10 @@
 # SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena @awkless.com>
 # SPDX-License-Identifier: MIT
 
-add_executable(cocoboy_unit_tests)
-target_sources(cocoboy_unit_tests
+add_executable(cbgb_tests)
+target_sources(cbgb_tests
   PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/test_memory.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/test_cpu.cpp")
-target_link_libraries(cocoboy_unit_tests PRIVATE cocoboy::emu cocoboy::deps Catch2::Catch2WithMain)
-catch_discover_tests(cocoboy_unit_tests)
+target_link_libraries(cbgb_tests PRIVATE cocoboy::cbgb cocoboy::deps Catch2::Catch2WithMain)
+catch_discover_tests(cbgb_tests)

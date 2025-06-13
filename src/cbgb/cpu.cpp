@@ -1,14 +1,14 @@
 // SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
 // SPDX-License-Identifier: MIT
 
-#include "cocoboy/soc/cpu.hpp"
-#include "cocoboy/soc/memory.hpp"
+#include "cbgb/cpu.hpp"
+#include "cbgb/memory.hpp"
 
 #include <spdlog/logger.h>
 #include <cstdint>
 #include <memory>
 
-namespace cocoboy::soc {
+namespace cbgb::cpu {
 RegisterFile::RegisterFile()
     : a(0x01),
       f(0x00),
@@ -31,7 +31,7 @@ RegisterFile::RegisterFile()
 {
 }
 
-Opcode::Opcode(std::shared_ptr<spdlog::logger> logger, RegisterFile& reg, MemoryBus& bus)
+Opcode::Opcode(std::shared_ptr<spdlog::logger> logger, RegisterFile& reg, cbgb::memory::MemoryBus& bus)
     : m_logger(logger), m_reg(reg), m_bus(bus)
 {
 }
@@ -203,7 +203,11 @@ void Opcode::ld_hlp_a(uint8_t opcode)
     ++m_reg.hl;
 }
 
-Sm83::Sm83(std::shared_ptr<spdlog::logger> logger, MemoryBus& bus)
+void Opcode::ld_rr_nn(uint8_t opcode)
+{
+}
+
+Sm83::Sm83(std::shared_ptr<spdlog::logger> logger, cbgb::memory::MemoryBus& bus)
     : m_logger(logger), m_bus(bus), m_run(m_logger, m_reg, m_bus)
 {
     m_logger->trace("Construct new SM83 CPU");
@@ -345,4 +349,4 @@ void Sm83::step()
             break;
     };
 }
-}  // namespace cocoboy::soc
+}  // namespace cbgb::cpu

@@ -1,6 +1,5 @@
-/* SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
- * SPDX-License-Identifier: MIT
- */
+// SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
+// SPDX-License-Identifier: MIT
 
 #ifndef COCOBOY_CONFIG_HPP
 #define COCOBOY_CONFIG_HPP
