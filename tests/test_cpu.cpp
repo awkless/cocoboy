@@ -100,7 +100,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_r_r(uint8_t opcode)", "[sm83_opcode_runner]
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("void Sm83::ld_r_r() test");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     uint8_t values[reg_file.r8.size()] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
@@ -126,7 +126,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_r_n(uint8_t opcode)", "[sm83_opcode_runner]
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("void Sm83::ld_r_n() test");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     uint8_t values[max_ld_r_n_targets] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
@@ -153,7 +153,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_r_hl(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("void Sm83::ld_r_hl() test");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.hl = 0xBEEF;
@@ -181,7 +181,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_hl_r(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("void Sm83::ld_hl_r() test");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     constexpr uint8_t values[reg_file.r8.size()] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
@@ -212,7 +212,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_hl_n(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("void Sm83::ld_hl_n() test");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.pc = 0x0100;
@@ -239,7 +239,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_a_bc(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (BC)");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.bc = 0xBEEF;
@@ -254,7 +254,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_a_de(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (DE)");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.de = 0xBEEF;
@@ -269,7 +269,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_bc_a(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (BC), A");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.bc = 0xBEEF;
@@ -284,7 +284,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_de_a(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (DE), A");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.de = 0xBEEF;
@@ -299,7 +299,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_a_nn(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (NN)");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     bus[0x0101] = 0xBE;
@@ -315,7 +315,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_nn_a(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (NN), A");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     bus[0x0101] = 0xBE;
@@ -331,7 +331,7 @@ TEST_CASE("void Sm83OpcodeRunner::ldh_a_c(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LDH A, (C)");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.c = 0x01;
@@ -344,7 +344,7 @@ TEST_CASE("void Sm83OpcodeRunner::ldh_c_a(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (C), A");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.c = 0x01;
@@ -357,7 +357,7 @@ TEST_CASE("void Sm83OpcodeRunner::ldh_a_n(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (N)");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     bus[0x0100] = 0xBF;
@@ -370,7 +370,7 @@ TEST_CASE("void Sm83OpcodeRunner::ldh_n_a(uint8_t opcode)", "[sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (N), A");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     bus[0x0100] = 0xBF;
@@ -383,7 +383,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_a_hlm(uint8_t opcode)", "[sm83_opcode_runne
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (HL-)");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.hl = 0xFFE0;
@@ -397,7 +397,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_hlm_a(uint8_t opcode)", "[sm83_opcode_runne
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (HL-), A");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.hl = 0xFFE0;
@@ -411,7 +411,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_a_hlp(uint8_t opcode)", "sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD A, (HL+)");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.hl = 0xFFE0;
@@ -425,7 +425,7 @@ TEST_CASE("void Sm83OpcodeRunner::ld_hlp_a(uint8_t opcode)", "sm83_opcode_runner
 {
     std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("LD (HL+), A");
     cocoboy::soc::MemoryBus bus(logger);
-    cocoboy::soc::Sm83RegisterFile reg_file;
+    cocoboy::soc::RegisterFile reg_file;
     cocoboy::soc::Sm83OpcodeRunner opcode(logger, reg_file, bus);
 
     reg_file.hl = 0xFFE0;

@@ -9,7 +9,7 @@
 #include <memory>
 
 namespace cocoboy::soc {
-Sm83RegisterFile::Sm83RegisterFile()
+RegisterFile::RegisterFile()
     : a(0x01),
       f(0x00),
       f_z(f),
@@ -32,7 +32,7 @@ Sm83RegisterFile::Sm83RegisterFile()
 }
 
 Sm83OpcodeRunner::Sm83OpcodeRunner(std::shared_ptr<spdlog::logger> logger,
-                                   Sm83RegisterFile& reg,
+                                   RegisterFile& reg,
                                    MemoryBus& bus)
     : m_logger(logger), m_reg(reg), m_bus(bus)
 {

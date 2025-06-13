@@ -15,11 +15,11 @@
 
 namespace cocoboy::soc {
 /// @brief SM83 register file representation.
-struct Sm83RegisterFile final {
+struct RegisterFile final {
     /// @brief Construct new register file.
     ///
     /// @return New instance of register file.
-    Sm83RegisterFile();
+    RegisterFile();
 
     /// Accumulator regsiter.
     Register<uint8_t> a;
@@ -218,7 +218,7 @@ public:
     /// @param bus Memory bus to use.
     ///
     /// @return Instance of opcode runner.
-    Sm83OpcodeRunner(std::shared_ptr<spdlog::logger> logger, Sm83RegisterFile& reg, MemoryBus& bus);
+    Sm83OpcodeRunner(std::shared_ptr<spdlog::logger> logger, RegisterFile& reg, MemoryBus& bus);
 
     /// @brief LD r, r': Load register (register).
     ///
@@ -303,7 +303,7 @@ private:
     std::shared_ptr<spdlog::logger> m_logger;
 
     /// Register file for CPU.
-    Sm83RegisterFile& m_reg;
+    RegisterFile& m_reg;
 
     /// Memory bus to send and receive computations from instruction set.
     MemoryBus& m_bus;
@@ -340,7 +340,7 @@ private:
     std::shared_ptr<spdlog::logger> m_logger;
 
     /// Register file for CPU.
-    Sm83RegisterFile m_reg;
+    RegisterFile m_reg;
 
     /// Memory bus to send and receive computations from instruction set.
     MemoryBus& m_bus;
