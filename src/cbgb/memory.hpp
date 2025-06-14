@@ -98,14 +98,14 @@ public:
 
     Register operator++(int)
     {
-        Register temp = *this;
+        Register temp(*this);
         *this = *this + 1;
         return temp;
     }
 
     Register operator--(int)
     {
-        Register temp = *this;
+        Register temp(*this);
         *this = *this - 1;
         return temp;
     }
@@ -177,16 +177,22 @@ public:
 
     operator P() const { return static_cast<P>((m_high << shift) | m_low); }
 
-    RegisterPair& operator++()
+    RegisterPair& operator++() { return *this = static_cast<P>(*this) + 1; }
+
+    RegisterPair& operator--() { return *this = static_cast<P>(*this) - 1; }
+
+    P operator++(int)
     {
-        P data = static_cast<P>(*this);
-        return *this = ++data;
+        P temp = static_cast<P>(*this);
+        *this = static_cast<P>(*this) + 1;
+        return temp;
     }
 
-    RegisterPair& operator--()
+    P operator--(int)
     {
-        P data = static_cast<P>(*this);
-        return *this = --data;
+        P temp = static_cast<P>(*this);
+        *this = static_cast<P>(*this) - 1;
+        return temp;
     }
 
 private:

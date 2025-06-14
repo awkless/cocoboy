@@ -103,3 +103,49 @@ TEST_CASE("RegisterPair& RegisterPair::operator--()", "[register_pair]")
     --reg_pair;
     REQUIRE(reg_pair == 0x00FF);
 }
+
+TEST_CASE("P RegisterPair::operator++()", "[register_pair]")
+{
+    cbgb::memory::Register<uint8_t> reg1(0x00);
+    cbgb::memory::Register<uint8_t> reg2(0x00);
+    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+
+    uint16_t value = 0;
+    value = reg_pair++;
+    REQUIRE(value == 0x0000);
+    REQUIRE(reg_pair == 0x0001);
+
+    reg1 = 0x01;
+    reg2 = 0xFF;
+    value = reg_pair++;
+    REQUIRE(value == 0x01FF);
+    REQUIRE(reg_pair == 0x0200);
+
+    reg_pair = 0x0100;
+    value = reg_pair++;
+    REQUIRE(value == 0x0100);
+    REQUIRE(reg_pair == 0x0101);
+}
+
+TEST_CASE("P RegisterPair::operator--(int)", "[register_pair]")
+{
+    cbgb::memory::Register<uint8_t> reg1(0x00);
+    cbgb::memory::Register<uint8_t> reg2(0x01);
+    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+
+    uint16_t value = 0;
+    value = reg_pair--;
+    REQUIRE(value == 0x0001);
+    REQUIRE(reg_pair == 0x0000);
+
+    reg1 = 0x01;
+    reg2 = 0xFF;
+    value = reg_pair--;
+    REQUIRE(value == 0x01FF);
+    REQUIRE(reg_pair == 0x01FE);
+
+    reg_pair = 0x0100;
+    value = reg_pair--;
+    REQUIRE(value == 0x0100);
+    REQUIRE(reg_pair == 0x00FF);
+}
