@@ -1,6 +1,49 @@
 // SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
 // SPDX-License-Identifier: MIT
 
+//! @brief GameBoy SoC memory manipulation and management.
+//!
+//! This area of CocoBoy's codebase is responsible for providing API's,
+//! general utilities, and abstractions that are needed for emulating the
+//! GameBoy's memory model.
+//!
+//! ## Memory Map
+//!
+//! The original GameBoy hardware utilizes a 16-bit address bus, and an 8-bit
+//! data bus \[[1]\]. This means that the GameBoy only has access to 16 KiB of
+//! addressable memory to work with. Despite this small amount of memory, all
+//! peripherals apart of the GameBoy SoC are memory mapped to the memory bus.
+//! Plus, certain regions of the GameBoy memory map are either only used for
+//! ROM or RAM. Here is a basic overview of what the memory map looks like:
+//!
+//! | Start  | End   | Description               | Notes                                         |
+//! | ------ | ----- | ------------------------- | --------------------------------------------- |
+//! | $0000  | $3FFF | 16 KiB ROM bank 00        | From cartridge, usually a fixed bank.         |
+//! | $4000  | $7FFF | 16 KiB ROM bank 00 - NN   | From cartridge, switchable bank.              |
+//! | $8000  | $9FFF | 8 KiB Video RAM (VRAM)    | In CGB mode, switchable bank 0/1.             |
+//! | $A000  | $BFFF | 8 KiB External RAM        | From cartidge, switchable bank if any.        |
+//! | $C000  | $CFFF | 4 KiB Work RAM            | Always available                              |
+//! | $D000  | $DFFF | 4 KiB Work RAM            | In CGB mode, switchable bank 1-7.             |
+//! | $E000  | $FDFF | Echo RAM                  | Nintendo says use of this area is prohibited. |
+//! | $FE00  | $FE9F | Object attribute memory   | Important memory segment for PPU.             |
+//! | $FEA0  | $FEFF | Not usable                | Nintendo says use of this area is prohibited. |
+//! | $FF00  | $FF7F | I/O registers             | Peripheral communication.                     |
+//! | $FF80  | $FFFE | High RAM (HRAM)           | Simliar to page 0 on 6502.                    |
+//! | $FFFF  | $FFFF | Interupt Enable register. | Control interupts for peripherals.            |
+//!
+//! ## Memory Banking
+//!
+//! The GameBoy uses memory banking to address the issue of limited memory for
+//! ROM and RAM. Certain address ranges allow for GameBoy cartridges to swap out
+//! their contents with a specificly sized memory bank through the use of a
+//! _mapper_/_memory bank controller (MBC)_ \[[2]\]. These mappers also come
+//! with special registers that a programmer can write data into to activate
+//! the bank swapping at any time. Nintendo specifies a number of different
+//! MBCs which can be idenfied by a byte at address $0147 \[[2]\].
+//!
+//! [1]: https://gbdev.io/pandocs/Memory_Map.html
+//! [2]: https://gbdev.io/pandocs/MBCs.html#mbcs
+
 #ifndef CBGB_MEMORY_HPP
 #define CBGB_MEMORY_HPP
 
@@ -14,56 +57,28 @@
 namespace cbgb::memory {
 /// @brief Shared physical system memory.
 ///
-/// Original GameBoy hardware utilizes a 16-bit address bus, and an 8-bit data
-/// bus[1]. This means that the full memory bus is only 64 kilobytes large.
-/// Despite operating on such a small amount of memory, Nintendo chose to employ
-/// memory mapping in order to communicate with peripherals like the joypad,
-/// PPU, MBCs, etc[1].
-///
-/// Thus, this type is meant to replicate the behaviour and quirks of the
-/// GameBoy memory bus, and is meant to be a shared resource between peripheral
-/// implemenations for the GameBoy SoC.
-///
-/// [1]: https://gbdev.io/pandocs/Memory_Map.html
+/// This type emulates the behaviour of the GameBoy memory bus, and is meant
+/// to be a shared resource between peripheral implemenations for the GameBoy
+/// SoC.
 class MemoryBus final {
 public:
-    /// @brief Construct new memory bus.
-    ///
-    /// @param logger Shared logger to document internal state.
-    /// @return Newly constructed memory bus.
     explicit MemoryBus(std::shared_ptr<spdlog::logger> logger);
-
-    /// @brief Immutable memory access.
-    ///
-    /// @param address Addess to access data from.
-    /// @return Immutable data from target address.
     const uint8_t& operator[](uint16_t address) const;
-
-    /// @brief Mutable memory access.
-    ///
-    /// @param addrss Address to access data from.
-    /// @return Mutable data from target address.
     uint8_t& operator[](uint16_t address);
 
 private:
-    /// Internal logger used for logging important memory states.
     std::shared_ptr<spdlog::logger> m_logger;
-
-    /// Full addressable random access memory representation.
     std::array<uint8_t, std::numeric_limits<uint16_t>::max()> m_ram;
 };
 
-/// @brief Register representation.
+/// @brief Hardware register.
 ///
-/// Represents a register either meant to be controlled by the SM83 CPU, or a peripheral on the
-/// GameBoy SoC. Recommended to to use types with explicit bit sizes to make bit manipulation
-/// more predictable.
+/// Represents a register either meant to be controlled by the SM83 CPU, or a
+/// peripheral on the GameBoy SoC. Recommended to to use types with explicit bit
+/// sizes.
 template <typename T>
 class Register final {
 public:
-    /// @brief Construct new register with initial state.
-    ///
-    /// @return New instance of register.
     explicit Register(T initial)
         : m_data(initial)
     {
@@ -76,68 +91,71 @@ public:
     }
 
     operator T() const { return static_cast<T>(m_data); }
-
-    Register& operator&=(T val)
-    {
-        m_data &= val;
-        return *this;
-    }
-
-    Register& operator|=(T val)
-    {
-        m_data |= val;
-        return *this;
-    }
-
+    Register& operator&=(T data) { return *this = *this & data; }
+    Register& operator|=(T data) { return *this = *this | data; }
     Register& operator++() { return *this = *this + 1; }
-
     Register& operator--() { return *this = *this - 1; }
+
+    Register operator++(int)
+    {
+        Register temp = *this;
+        *this = *this + 1;
+        return temp;
+    }
+
+    Register operator--(int)
+    {
+        Register temp = *this;
+        *this = *this - 1;
+        return temp;
+    }
 
 private:
     T m_data;
 };
 
-/// @brief Control bits of register.
-template <unsigned int bitno, unsigned int nbits, typename T = uint8_t>
+/// @brief Control bits of target #Register.
+///
+/// Basic wrapper over #Register. Allows the caller to manipulate target bits
+/// of a given #Register with relative ease. Should generally be used to control
+/// target bits that either represent flags, or special controls for a
+/// peripheral.
+///
+/// @invariant Target bit range must fall within accessable bits of register.
+/// @invariant Target bit position is in range of accessable bits of register.
+template <unsigned int position, unsigned int length, typename T = uint8_t>
 class RegisterBit final {
 public:
-    /// @brief Construct new register bit controller.
-    explicit RegisterBit(Register<T>& reg)
-        : m_reg(reg)
+    explicit RegisterBit(Register<T>& target)
+        : m_register(target)
     {
+        constexpr unsigned int max_bits = std::numeric_limits<T>::digits;
+        static_assert(length <= max_bits, "Bit range exceeds accessable bits of register");
+        static_assert(position < max_bits, "Bit position exceeds accessable bits of register");
     }
 
-    /// @brief Assign value into bits of register.
-    ///
-    /// @return Return self with new value.
     RegisterBit& operator=(T val)
     {
-        m_reg &= static_cast<T>(~(mask << bitno));
-        m_reg |= static_cast<T>(((val & mask) << bitno));
+        m_register &= static_cast<T>(~(mask << position));
+        m_register |= static_cast<T>(((val & mask) << position));
         return *this;
     }
 
-    /// @brief Implicitly convert bits of register into taraget type.
-    ///
-    /// @return Bits implicitly converted from register.
-    operator T() const { return (m_reg >> bitno) & mask; }
+    operator T() const { return (m_register >> position) & mask; }
 
 private:
-    static constexpr T mask = (T(1) << nbits) - T(1);
-    Register<T>& m_reg;
+    static constexpr T mask = (T(1) << length) - T(1);
+    Register<T>& m_register;
 };
 
-/// @brief Register pair representation.
+/// @brief Hardware register pair.
 ///
-/// Uses two registers of the same type to form one larger register.
+/// Uses two #Registers of the same type to form one larger register.
 ///
 /// @invariant Bit length of P must be T * 2 bit length.
 template <typename P, typename T>
 class RegisterPair final {
 public:
-    /// @brief Construct new register pair through target register types.
-    ///
-    /// @return Newly constructed instance of register pair.
     RegisterPair(Register<T>& high, Register<T>& low)
         : m_high(high)
         , m_low(low)
@@ -150,7 +168,6 @@ public:
         );
     }
 
-    /// @brief Assign data into register pair.
     RegisterPair& operator=(P data)
     {
         m_high = static_cast<T>(data >> shift);
@@ -158,23 +175,14 @@ public:
         return *this;
     }
 
-    /// @brief Implicitly convert register pair to target type.
-    ///
-    /// @return Data of register pair as target type.
     operator P() const { return static_cast<P>((m_high << shift) | m_low); }
 
-    /// @brief Prefix increment register pair.
-    ///
-    /// @return Prefix incremented self.
     RegisterPair& operator++()
     {
         P data = static_cast<P>(*this);
         return *this = ++data;
     }
 
-    /// @brief Prefix decrement register pair.
-    ///
-    /// @return Prefix decremented self.
     RegisterPair& operator--()
     {
         P data = static_cast<P>(*this);
