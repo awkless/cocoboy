@@ -14,15 +14,16 @@ MemoryBus::MemoryBus(std::shared_ptr<spdlog::logger> logger)
     m_logger->trace("Construct new memory bus");
 }
 
-const uint8_t& MemoryBus::operator[](uint16_t address) const
+uint8_t MemoryBus::read(uint16_t address)
 {
-    m_logger->debug("Access address {0:04X}");
-    return m_ram[address];
+    uint8_t value = m_ram[address];
+    m_logger->debug("Read {0:04X}: {1:02X}", address, value);
+    return value;
 }
 
-uint8_t& MemoryBus::operator[](uint16_t address)
+void MemoryBus::write(uint16_t address, uint8_t value)
 {
-    m_logger->debug("Access address {0:04X}", address);
-    return m_ram[address];
+    m_logger->debug("Write {0:04X}: {1:02X}", address, value);
+    m_ram[address] = value;
 }
 } // namespace cbgb

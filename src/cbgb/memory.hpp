@@ -63,8 +63,8 @@ namespace cbgb {
 class MemoryBus final {
 public:
     explicit MemoryBus(std::shared_ptr<spdlog::logger> logger);
-    const uint8_t& operator[](uint16_t address) const;
-    uint8_t& operator[](uint16_t address);
+    uint8_t read(uint16_t address);
+    void write(uint16_t address, uint8_t value);
 
 private:
     std::shared_ptr<spdlog::logger> m_logger;
@@ -135,7 +135,7 @@ struct RegisterBitField final {
     Register<T>& control;
     static constexpr T mask = (T(1) << length) - T(1);
 
-    explicit RegisterBitField(Register<T>& target)
+    constexpr explicit RegisterBitField(Register<T>& target)
         : control(target)
     {
         constexpr unsigned int max_bits = std::numeric_limits<T>::digits;
