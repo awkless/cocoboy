@@ -54,7 +54,7 @@
 
 #include <spdlog/spdlog.h>
 
-namespace cbgb::memory {
+namespace cbgb {
 /// @brief Shared physical system memory.
 ///
 /// This type emulates the behaviour of the GameBoy memory bus, and is meant
@@ -77,24 +77,34 @@ private:
 /// peripheral on the GameBoy SoC. Recommended to to use types with explicit bit
 /// sizes.
 template <typename T>
-class Register final {
-public:
+struct Register final {
+    T value;
+
     explicit Register(T initial)
-        : m_data(initial)
+        : value(initial)
     {
     }
 
     Register& operator=(T data)
     {
-        m_data = data;
+        value = data;
         return *this;
     }
 
-    operator T() const { return static_cast<T>(m_data); }
-    Register& operator&=(T data) { return *this = *this & data; }
-    Register& operator|=(T data) { return *this = *this | data; }
-    Register& operator++() { return *this = *this + 1; }
-    Register& operator--() { return *this = *this - 1; }
+    operator T() const
+    {
+        return static_cast<T>(value);
+    }
+
+    Register& operator++()
+    {
+        return *this = *this + 1;
+    }
+
+    Register& operator--()
+    {
+        return *this = *this - 1;
+    }
 
     Register operator++(int)
     {
@@ -109,9 +119,6 @@ public:
         *this = *this - 1;
         return temp;
     }
-
-private:
-    T m_data;
 };
 
 /// @brief Control bits of target #Register.
@@ -124,28 +131,29 @@ private:
 /// @invariant Target bit range must fall within accessable bits of register.
 /// @invariant Target bit position is in range of accessable bits of register.
 template <unsigned int position, unsigned int length, typename T = uint8_t>
-class RegisterBit final {
-public:
-    explicit RegisterBit(Register<T>& target)
-        : m_register(target)
+struct RegisterBitField final {
+    Register<T>& control;
+    static constexpr T mask = (T(1) << length) - T(1);
+
+    explicit RegisterBitField(Register<T>& target)
+        : control(target)
     {
         constexpr unsigned int max_bits = std::numeric_limits<T>::digits;
         static_assert(length <= max_bits, "Bit range exceeds accessable bits of register");
         static_assert(position < max_bits, "Bit position exceeds accessable bits of register");
     }
 
-    RegisterBit& operator=(T val)
+    RegisterBitField& operator=(T value)
     {
-        m_register &= static_cast<T>(~(mask << position));
-        m_register |= static_cast<T>(((val & mask) << position));
+        control
+            = static_cast<T>((control & ~(mask << position)) | ((value & mask) << position));
         return *this;
     }
 
-    operator T() const { return (m_register >> position) & mask; }
-
-private:
-    static constexpr T mask = (T(1) << length) - T(1);
-    Register<T>& m_register;
+    operator T() const
+    {
+        return (control >> position) & mask;
+    }
 };
 
 /// @brief Hardware register pair.
@@ -154,11 +162,14 @@ private:
 ///
 /// @invariant Bit length of P must be T * 2 bit length.
 template <typename P, typename T>
-class RegisterPair final {
-public:
-    RegisterPair(Register<T>& high, Register<T>& low)
-        : m_high(high)
-        , m_low(low)
+struct RegisterPair final {
+    Register<T>& high;
+    Register<T>& low;
+    static constexpr unsigned int shift = std::numeric_limits<P>::digits / 2;
+
+    RegisterPair(Register<T>& target1, Register<T>& target2)
+        : high(target1)
+        , low(target2)
     {
         constexpr unsigned int max_bits = std::numeric_limits<P>::digits;
         constexpr unsigned int pair_bits = std::numeric_limits<T>::digits * 2;
@@ -170,16 +181,25 @@ public:
 
     RegisterPair& operator=(P data)
     {
-        m_high = static_cast<T>(data >> shift);
-        m_low = static_cast<T>(data);
+        high = static_cast<T>(data >> shift);
+        low = static_cast<T>(data);
         return *this;
     }
 
-    operator P() const { return static_cast<P>((m_high << shift) | m_low); }
+    operator P() const
+    {
+        return static_cast<P>((high << shift) | low);
+    }
 
-    RegisterPair& operator++() { return *this = static_cast<P>(*this) + 1; }
+    RegisterPair& operator++()
+    {
+        return *this = static_cast<P>(*this) + 1;
+    }
 
-    RegisterPair& operator--() { return *this = static_cast<P>(*this) - 1; }
+    RegisterPair& operator--()
+    {
+        return *this = static_cast<P>(*this) - 1;
+    }
 
     P operator++(int)
     {
@@ -194,37 +214,32 @@ public:
         *this = static_cast<P>(*this) - 1;
         return temp;
     }
-
-private:
-    static constexpr unsigned int shift = std::numeric_limits<P>::digits / 2;
-    Register<T>& m_high;
-    Register<T>& m_low;
 };
-} // namespace cbgb::memory
+} // namespace cbgb
 
 namespace fmt {
 template <typename T>
-struct formatter<cbgb::memory::Register<T>> : formatter<T> {
+struct formatter<cbgb::Register<T>> : formatter<T> {
     template <typename FormatContext>
-    auto format(const cbgb::memory::Register<T>& reg, FormatContext& ctx) const
+    auto format(const cbgb::Register<T>& reg, FormatContext& ctx) const
     {
         return format_to(ctx.out(), "0x{:X}", static_cast<T>(reg));
     }
 };
 
-template <unsigned int bitno, unsigned int nbits, typename T>
-struct formatter<cbgb::memory::RegisterBit<bitno, nbits, T>> : formatter<T> {
+template <unsigned int position, unsigned int length, typename T>
+struct formatter<cbgb::RegisterBitField<position, length, T>> : formatter<T> {
     template <typename FormatContext>
-    auto format(const cbgb::memory::RegisterBit<bitno, nbits, T>& reg, FormatContext& ctx) const
+    auto format(const cbgb::RegisterBitField<position, length, T>& reg, FormatContext& ctx) const
     {
         return format_to(ctx.out(), "0x{:X}", static_cast<T>(reg));
     }
 };
 
 template <typename P, typename T>
-struct formatter<cbgb::memory::RegisterPair<P, T>> : formatter<T> {
+struct formatter<cbgb::RegisterPair<P, T>> : formatter<T> {
     template <typename FormatContext>
-    auto format(const cbgb::memory::RegisterPair<P, T>& reg, FormatContext& ctx) const
+    auto format(const cbgb::RegisterPair<P, T>& reg, FormatContext& ctx) const
     {
         return format_to(ctx.out(), "0x{:X}", static_cast<P>(reg));
     }

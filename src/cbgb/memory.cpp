@@ -3,11 +3,11 @@
 
 #include <memory>
 
-#include "cbgb/memory.hpp"
-
 #include <spdlog/spdlog.h>
 
-namespace cbgb::memory {
+#include "cbgb/memory.hpp"
+
+namespace cbgb {
 MemoryBus::MemoryBus(std::shared_ptr<spdlog::logger> logger)
     : m_logger(logger)
 {
@@ -25,4 +25,4 @@ uint8_t& MemoryBus::operator[](uint16_t address)
     m_logger->debug("Access address {0:04X}", address);
     return m_ram[address];
 }
-} // namespace cbgb::memory
+} // namespace cbgb

@@ -6,12 +6,12 @@
 #include <catch2/catch_test_macros.hpp>
 #include <cstdint>
 
-TEST_CASE("RegisterBit& RegisterBit::operator=(T val)", "[register_bit]")
+TEST_CASE("RegisterBitField& RegisterBitField::operator=(T val)", "[register_bit_field]")
 {
-    cbgb::memory::Register<uint8_t> reg(0x00);
-    cbgb::memory::RegisterBit<0, 1, uint8_t> bit1(reg);
-    cbgb::memory::RegisterBit<1, 3, uint8_t> bit2(reg);
-    cbgb::memory::RegisterBit<4, 4, uint8_t> bit3(reg);
+    cbgb::Register<uint8_t> reg(0x00);
+    cbgb::RegisterBitField<0, 1, uint8_t> bit1(reg);
+    cbgb::RegisterBitField<1, 3, uint8_t> bit2(reg);
+    cbgb::RegisterBitField<4, 4, uint8_t> bit3(reg);
 
     bit1 = 0x1;
     bit2 = 0x2;
@@ -19,12 +19,12 @@ TEST_CASE("RegisterBit& RegisterBit::operator=(T val)", "[register_bit]")
     REQUIRE(reg == 0b11110101);
 }
 
-TEST_CASE("RegisterBit::operator T() const", "[register_bit]")
+TEST_CASE("RegisterBitField::operator T() const", "[register_bit_field]")
 {
-    cbgb::memory::Register<uint8_t> reg(0x00);
-    cbgb::memory::RegisterBit<0, 1, uint8_t> bit1(reg);
-    cbgb::memory::RegisterBit<1, 3, uint8_t> bit2(reg);
-    cbgb::memory::RegisterBit<4, 4, uint8_t> bit3(reg);
+    cbgb::Register<uint8_t> reg(0x00);
+    cbgb::RegisterBitField<0, 1, uint8_t> bit1(reg);
+    cbgb::RegisterBitField<1, 3, uint8_t> bit2(reg);
+    cbgb::RegisterBitField<4, 4, uint8_t> bit3(reg);
 
 
     bit1 = 0x1;
@@ -40,9 +40,9 @@ TEST_CASE("RegisterBit::operator T() const", "[register_bit]")
 
 TEST_CASE("RegisterPair& RegisterPair::operator=(T val)", "[register_pair]")
 {
-    cbgb::memory::Register<uint8_t> reg1(0x00);
-    cbgb::memory::Register<uint8_t> reg2(0x00);
-    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+    cbgb::Register<uint8_t> reg1(0x00);
+    cbgb::Register<uint8_t> reg2(0x00);
+    cbgb::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
     reg_pair = 0xDEAD;
     REQUIRE(reg_pair == 0xDEAD);
@@ -56,9 +56,9 @@ TEST_CASE("RegisterPair& RegisterPair::operator=(T val)", "[register_pair]")
 
 TEST_CASE("RegisterPair& RegisterPair::operator P() const", "[register_pair]")
 {
-    cbgb::memory::Register<uint8_t> reg1(0x00);
-    cbgb::memory::Register<uint8_t> reg2(0x00);
-    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+    cbgb::Register<uint8_t> reg1(0x00);
+    cbgb::Register<uint8_t> reg2(0x00);
+    cbgb::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
     reg1 = 0x12;
     reg2 = 0x34;
@@ -68,9 +68,9 @@ TEST_CASE("RegisterPair& RegisterPair::operator P() const", "[register_pair]")
 
 TEST_CASE("RegisterPair& RegisterPair::operator++()", "[register_pair]")
 {
-    cbgb::memory::Register<uint8_t> reg1(0x00);
-    cbgb::memory::Register<uint8_t> reg2(0x00);
-    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+    cbgb::Register<uint8_t> reg1(0x00);
+    cbgb::Register<uint8_t> reg2(0x00);
+    cbgb::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
     ++reg_pair;
     REQUIRE(reg_pair == 0x0001);
@@ -87,9 +87,9 @@ TEST_CASE("RegisterPair& RegisterPair::operator++()", "[register_pair]")
 
 TEST_CASE("RegisterPair& RegisterPair::operator--()", "[register_pair]")
 {
-    cbgb::memory::Register<uint8_t> reg1(0x00);
-    cbgb::memory::Register<uint8_t> reg2(0x01);
-    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+    cbgb::Register<uint8_t> reg1(0x00);
+    cbgb::Register<uint8_t> reg2(0x01);
+    cbgb::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
     --reg_pair;
     REQUIRE(reg_pair == 0x0000);
@@ -106,9 +106,9 @@ TEST_CASE("RegisterPair& RegisterPair::operator--()", "[register_pair]")
 
 TEST_CASE("P RegisterPair::operator++()", "[register_pair]")
 {
-    cbgb::memory::Register<uint8_t> reg1(0x00);
-    cbgb::memory::Register<uint8_t> reg2(0x00);
-    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+    cbgb::Register<uint8_t> reg1(0x00);
+    cbgb::Register<uint8_t> reg2(0x00);
+    cbgb::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
     uint16_t value = 0;
     value = reg_pair++;
@@ -129,9 +129,9 @@ TEST_CASE("P RegisterPair::operator++()", "[register_pair]")
 
 TEST_CASE("P RegisterPair::operator--(int)", "[register_pair]")
 {
-    cbgb::memory::Register<uint8_t> reg1(0x00);
-    cbgb::memory::Register<uint8_t> reg2(0x01);
-    cbgb::memory::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
+    cbgb::Register<uint8_t> reg1(0x00);
+    cbgb::Register<uint8_t> reg2(0x01);
+    cbgb::RegisterPair<uint16_t, uint8_t> reg_pair(reg1, reg2);
 
     uint16_t value = 0;
     value = reg_pair--;
