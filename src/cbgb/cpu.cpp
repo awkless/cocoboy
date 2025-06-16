@@ -69,6 +69,20 @@ enum OpcodeKind : uint8_t {
     LD_H_N = 0x26,
     LD_L_N = 0x2E,
     LD_A_N = 0x3E,
+    LD_B_HL = 0x46,
+    LD_C_HL = 0x4E,
+    LD_D_HL = 0x56,
+    LD_E_HL = 0x5E,
+    LD_H_HL = 0x66,
+    LD_L_HL = 0x6E,
+    LD_A_HL = 0x7E,
+    LD_HL_B = 0x70,
+    LD_HL_C = 0x71,
+    LD_HL_D = 0x72,
+    LD_HL_E = 0x73,
+    LD_HL_H = 0x74,
+    LD_HL_L = 0x75,
+    LD_HL_A = 0x77,
 };
 
 static inline void ld_b_b(Sm83State& cpu)
@@ -350,6 +364,76 @@ static inline void ld_a_n(Sm83State& cpu)
     cpu.a = cpu.memory.read(cpu.pc++);
 }
 
+static inline void ld_b_hl(Sm83State& cpu)
+{
+    cpu.b = cpu.memory.read(cpu.hl);
+}
+
+static inline void ld_c_hl(Sm83State& cpu)
+{
+    cpu.c = cpu.memory.read(cpu.hl);
+}
+
+static inline void ld_d_hl(Sm83State& cpu)
+{
+    cpu.d = cpu.memory.read(cpu.hl);
+}
+
+static inline void ld_e_hl(Sm83State& cpu)
+{
+    cpu.e = cpu.memory.read(cpu.hl);
+}
+
+static inline void ld_h_hl(Sm83State& cpu)
+{
+    cpu.h = cpu.memory.read(cpu.hl);
+}
+
+static inline void ld_l_hl(Sm83State& cpu)
+{
+    cpu.l = cpu.memory.read(cpu.hl);
+}
+
+static inline void ld_a_hl(Sm83State& cpu)
+{
+    cpu.a = cpu.memory.read(cpu.hl);
+}
+
+static inline void ld_hl_b(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.hl, cpu.b);
+}
+
+static inline void ld_hl_c(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.hl, cpu.c);
+}
+
+static inline void ld_hl_d(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.hl, cpu.d);
+}
+
+static inline void ld_hl_e(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.hl, cpu.e);
+}
+
+static inline void ld_hl_h(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.hl, cpu.h);
+}
+
+static inline void ld_hl_l(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.hl, cpu.l);
+}
+
+static inline void ld_hl_a(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.hl, cpu.a);
+}
+
 struct Opcode final {
     std::string_view mnemonic;
     unsigned int length;
@@ -416,6 +500,20 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
     table[OpcodeKind::LD_H_N] = Opcode { "LD H, n", 2, 2, ld_h_n };
     table[OpcodeKind::LD_L_N] = Opcode { "LD L, n", 2, 2, ld_l_n };
     table[OpcodeKind::LD_A_N] = Opcode { "LD A, n", 2, 2, ld_a_n };
+    table[OpcodeKind::LD_B_HL] = Opcode { "LD B, (HL)", 1, 2, ld_b_hl };
+    table[OpcodeKind::LD_C_HL] = Opcode { "LD C, (HL)", 1, 2, ld_c_hl };
+    table[OpcodeKind::LD_D_HL] = Opcode { "LD D, (HL)", 1, 2, ld_d_hl };
+    table[OpcodeKind::LD_E_HL] = Opcode { "LD E, (HL)", 1, 2, ld_e_hl };
+    table[OpcodeKind::LD_H_HL] = Opcode { "LD H, (HL)", 1, 2, ld_h_hl };
+    table[OpcodeKind::LD_L_HL] = Opcode { "LD L, (HL)", 1, 2, ld_l_hl };
+    table[OpcodeKind::LD_A_HL] = Opcode { "LD A, (HL)", 1, 2, ld_a_hl };
+    table[OpcodeKind::LD_HL_B] = Opcode { "LD (HL), B", 1, 2, ld_hl_b };
+    table[OpcodeKind::LD_HL_B] = Opcode { "LD (HL), C", 1, 2, ld_hl_c };
+    table[OpcodeKind::LD_HL_B] = Opcode { "LD (HL), D", 1, 2, ld_hl_d };
+    table[OpcodeKind::LD_HL_B] = Opcode { "LD (HL), E", 1, 2, ld_hl_e };
+    table[OpcodeKind::LD_HL_B] = Opcode { "LD (HL), H", 1, 2, ld_hl_h };
+    table[OpcodeKind::LD_HL_B] = Opcode { "LD (HL), L", 1, 2, ld_hl_l };
+    table[OpcodeKind::LD_HL_B] = Opcode { "LD (HL), A", 1, 2, ld_hl_a };
     return table;
 }
 constexpr std::array<Opcode, 256> opcode_jump_table = new_opcode_jump_table();
