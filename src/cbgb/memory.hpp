@@ -145,8 +145,7 @@ struct RegisterBitField final {
 
     RegisterBitField& operator=(T value)
     {
-        control
-            = static_cast<T>((control & ~(mask << position)) | ((value & mask) << position));
+        control = static_cast<T>((control & ~(mask << position)) | ((value & mask) << position));
         return *this;
     }
 
