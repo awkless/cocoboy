@@ -14,6 +14,54 @@
 namespace cbgb {
 enum OpcodeKind : uint8_t {
     LD_B_B = 0x40,
+    LD_B_C = 0x41,
+    LD_B_D = 0x42,
+    LD_B_E = 0x43,
+    LD_B_H = 0x44,
+    LD_B_L = 0x45,
+    LD_B_A = 0x47,
+    LD_C_B = 0x48,
+    LD_C_C = 0x49,
+    LD_C_D = 0x4A,
+    LD_C_E = 0x4B,
+    LD_C_H = 0x4C,
+    LD_C_L = 0x4D,
+    LD_C_A = 0x4F,
+    LD_D_B = 0x50,
+    LD_D_C = 0x51,
+    LD_D_D = 0x52,
+    LD_D_E = 0x53,
+    LD_D_H = 0x54,
+    LD_D_L = 0x55,
+    LD_D_A = 0x57,
+    LD_E_B = 0x58,
+    LD_E_C = 0x59,
+    LD_E_D = 0x5A,
+    LD_E_E = 0x5B,
+    LD_E_H = 0x5C,
+    LD_E_L = 0x5D,
+    LD_E_A = 0x5F,
+    LD_H_B = 0x60,
+    LD_H_C = 0x61,
+    LD_H_D = 0x62,
+    LD_H_E = 0x63,
+    LD_H_H = 0x64,
+    LD_H_L = 0x65,
+    LD_H_A = 0x67,
+    LD_L_B = 0x68,
+    LD_L_C = 0x69,
+    LD_L_D = 0x6A,
+    LD_L_E = 0x6B,
+    LD_L_H = 0x6C,
+    LD_L_L = 0x6D,
+    LD_L_A = 0x6F,
+    LD_A_B = 0x78,
+    LD_A_C = 0x79,
+    LD_A_D = 0x7A,
+    LD_A_E = 0x7B,
+    LD_A_H = 0x7C,
+    LD_A_L = 0x7D,
+    LD_A_A = 0x7F,
     LD_B_N = 0x06,
     LD_C_N = 0x0E,
     LD_D_N = 0x16,
@@ -23,41 +71,281 @@ enum OpcodeKind : uint8_t {
     LD_A_N = 0x3E,
 };
 
-void ld_b_b(Sm83State& cpu)
+static inline void ld_b_b(Sm83State& cpu)
 {
     cpu.b = cpu.b;
 }
 
-void ld_b_n(Sm83State& cpu)
+static inline void ld_b_c(Sm83State& cpu)
+{
+    cpu.b = cpu.c;
+}
+
+static inline void ld_b_d(Sm83State& cpu)
+{
+    cpu.b = cpu.d;
+}
+
+static inline void ld_b_e(Sm83State& cpu)
+{
+    cpu.b = cpu.e;
+}
+
+static inline void ld_b_h(Sm83State& cpu)
+{
+    cpu.b = cpu.h;
+}
+
+static inline void ld_b_l(Sm83State& cpu)
+{
+    cpu.b = cpu.l;
+}
+
+static inline void ld_b_a(Sm83State& cpu)
+{
+    cpu.b = cpu.a;
+}
+
+static inline void ld_c_b(Sm83State& cpu)
+{
+    cpu.c = cpu.b;
+}
+
+static inline void ld_c_c(Sm83State& cpu)
+{
+    cpu.c = cpu.c;
+}
+
+static inline void ld_c_d(Sm83State& cpu)
+{
+    cpu.c = cpu.d;
+}
+
+static inline void ld_c_e(Sm83State& cpu)
+{
+    cpu.c = cpu.e;
+}
+
+static inline void ld_c_h(Sm83State& cpu)
+{
+    cpu.c = cpu.h;
+}
+
+static inline void ld_c_l(Sm83State& cpu)
+{
+    cpu.c = cpu.l;
+}
+
+static inline void ld_c_a(Sm83State& cpu)
+{
+    cpu.c = cpu.a;
+}
+
+static inline void ld_d_b(Sm83State& cpu)
+{
+    cpu.d = cpu.b;
+}
+
+static inline void ld_d_c(Sm83State& cpu)
+{
+    cpu.d = cpu.c;
+}
+
+static inline void ld_d_d(Sm83State& cpu)
+{
+    cpu.d = cpu.d;
+}
+
+static inline void ld_d_e(Sm83State& cpu)
+{
+    cpu.d = cpu.e;
+}
+
+static inline void ld_d_h(Sm83State& cpu)
+{
+    cpu.d = cpu.h;
+}
+
+static inline void ld_d_l(Sm83State& cpu)
+{
+    cpu.d = cpu.l;
+}
+
+static inline void ld_d_a(Sm83State& cpu)
+{
+    cpu.d = cpu.a;
+}
+
+static inline void ld_e_b(Sm83State& cpu)
+{
+    cpu.e = cpu.b;
+}
+
+static inline void ld_e_c(Sm83State& cpu)
+{
+    cpu.e = cpu.c;
+}
+
+static inline void ld_e_d(Sm83State& cpu)
+{
+    cpu.e = cpu.d;
+}
+
+static inline void ld_e_e(Sm83State& cpu)
+{
+    cpu.e = cpu.e;
+}
+
+static inline void ld_e_h(Sm83State& cpu)
+{
+    cpu.e = cpu.h;
+}
+
+static inline void ld_e_l(Sm83State& cpu)
+{
+    cpu.e = cpu.l;
+}
+
+static inline void ld_e_a(Sm83State& cpu)
+{
+    cpu.e = cpu.a;
+}
+
+static inline void ld_h_b(Sm83State& cpu)
+{
+    cpu.h = cpu.b;
+}
+
+static inline void ld_h_c(Sm83State& cpu)
+{
+    cpu.h = cpu.c;
+}
+
+static inline void ld_h_d(Sm83State& cpu)
+{
+    cpu.h = cpu.d;
+}
+
+static inline void ld_h_e(Sm83State& cpu)
+{
+    cpu.h = cpu.e;
+}
+
+static inline void ld_h_h(Sm83State& cpu)
+{
+    cpu.h = cpu.h;
+}
+
+static inline void ld_h_l(Sm83State& cpu)
+{
+    cpu.h = cpu.l;
+}
+
+static inline void ld_h_a(Sm83State& cpu)
+{
+    cpu.h = cpu.a;
+}
+
+static inline void ld_l_b(Sm83State& cpu)
+{
+    cpu.l = cpu.b;
+}
+
+static inline void ld_l_c(Sm83State& cpu)
+{
+    cpu.l = cpu.c;
+}
+
+static inline void ld_l_d(Sm83State& cpu)
+{
+    cpu.l = cpu.d;
+}
+
+static inline void ld_l_e(Sm83State& cpu)
+{
+    cpu.l = cpu.e;
+}
+
+static inline void ld_l_h(Sm83State& cpu)
+{
+    cpu.l = cpu.h;
+}
+
+static inline void ld_l_l(Sm83State& cpu)
+{
+    cpu.l = cpu.l;
+}
+
+static inline void ld_l_a(Sm83State& cpu)
+{
+    cpu.l = cpu.a;
+}
+
+static inline void ld_a_b(Sm83State& cpu)
+{
+    cpu.a = cpu.b;
+}
+
+static inline void ld_a_c(Sm83State& cpu)
+{
+    cpu.a = cpu.c;
+}
+
+static inline void ld_a_d(Sm83State& cpu)
+{
+    cpu.a = cpu.d;
+}
+
+static inline void ld_a_e(Sm83State& cpu)
+{
+    cpu.a = cpu.e;
+}
+
+static inline void ld_a_h(Sm83State& cpu)
+{
+    cpu.a = cpu.h;
+}
+
+static inline void ld_a_l(Sm83State& cpu)
+{
+    cpu.a = cpu.l;
+}
+
+static inline void ld_a_a(Sm83State& cpu)
+{
+    cpu.a = cpu.a;
+}
+
+static inline void ld_b_n(Sm83State& cpu)
 {
     cpu.b = cpu.memory.read(cpu.pc++);
 }
 
-void ld_c_n(Sm83State& cpu)
+static inline void ld_c_n(Sm83State& cpu)
 {
     cpu.c = cpu.memory.read(cpu.pc++);
 }
-void ld_d_n(Sm83State& cpu)
+static inline void ld_d_n(Sm83State& cpu)
 {
     cpu.d = cpu.memory.read(cpu.pc++);
 }
 
-void ld_e_n(Sm83State& cpu)
+static inline void ld_e_n(Sm83State& cpu)
 {
     cpu.e = cpu.memory.read(cpu.pc++);
 }
 
-void ld_h_n(Sm83State& cpu)
+static inline void ld_h_n(Sm83State& cpu)
 {
     cpu.h = cpu.memory.read(cpu.pc++);
 }
 
-void ld_l_n(Sm83State& cpu)
+static inline void ld_l_n(Sm83State& cpu)
 {
     cpu.l = cpu.memory.read(cpu.pc++);
 }
 
-void ld_a_n(Sm83State& cpu)
+static inline void ld_a_n(Sm83State& cpu)
 {
     cpu.a = cpu.memory.read(cpu.pc++);
 }
@@ -73,6 +361,54 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
 {
     std::array<Opcode, 256> table = {};
     table[OpcodeKind::LD_B_B] = Opcode { "LD B, B", 1, 1, ld_b_b };
+    table[OpcodeKind::LD_B_C] = Opcode { "LD B, C", 1, 1, ld_b_c };
+    table[OpcodeKind::LD_B_D] = Opcode { "LD B, D", 1, 1, ld_b_d };
+    table[OpcodeKind::LD_B_E] = Opcode { "LD B, E", 1, 1, ld_b_e };
+    table[OpcodeKind::LD_B_H] = Opcode { "LD B, H", 1, 1, ld_b_h };
+    table[OpcodeKind::LD_B_L] = Opcode { "LD B, L", 1, 1, ld_b_l };
+    table[OpcodeKind::LD_B_A] = Opcode { "LD B, A", 1, 1, ld_b_a };
+    table[OpcodeKind::LD_C_B] = Opcode { "LD B, B", 1, 1, ld_c_b };
+    table[OpcodeKind::LD_C_C] = Opcode { "LD C, C", 1, 1, ld_c_c };
+    table[OpcodeKind::LD_C_D] = Opcode { "LD C, D", 1, 1, ld_c_d };
+    table[OpcodeKind::LD_C_E] = Opcode { "LD C, E", 1, 1, ld_c_e };
+    table[OpcodeKind::LD_C_H] = Opcode { "LD C, H", 1, 1, ld_c_h };
+    table[OpcodeKind::LD_C_L] = Opcode { "LD C, L", 1, 1, ld_c_l };
+    table[OpcodeKind::LD_C_A] = Opcode { "LD C, A", 1, 1, ld_c_a };
+    table[OpcodeKind::LD_D_B] = Opcode { "LD D, B", 1, 1, ld_d_b };
+    table[OpcodeKind::LD_D_C] = Opcode { "LD D, C", 1, 1, ld_d_c };
+    table[OpcodeKind::LD_D_D] = Opcode { "LD D, D", 1, 1, ld_d_d };
+    table[OpcodeKind::LD_D_E] = Opcode { "LD D, E", 1, 1, ld_d_e };
+    table[OpcodeKind::LD_D_H] = Opcode { "LD D, H", 1, 1, ld_d_h };
+    table[OpcodeKind::LD_D_L] = Opcode { "LD D, L", 1, 1, ld_d_l };
+    table[OpcodeKind::LD_D_A] = Opcode { "LD D, A", 1, 1, ld_d_a };
+    table[OpcodeKind::LD_E_B] = Opcode { "LD E, B", 1, 1, ld_e_b };
+    table[OpcodeKind::LD_E_C] = Opcode { "LD E, C", 1, 1, ld_e_c };
+    table[OpcodeKind::LD_E_D] = Opcode { "LD E, D", 1, 1, ld_e_d };
+    table[OpcodeKind::LD_E_E] = Opcode { "LD E, E", 1, 1, ld_e_e };
+    table[OpcodeKind::LD_E_H] = Opcode { "LD E, H", 1, 1, ld_e_h };
+    table[OpcodeKind::LD_E_L] = Opcode { "LD E, L", 1, 1, ld_e_l };
+    table[OpcodeKind::LD_E_A] = Opcode { "LD E, A", 1, 1, ld_e_a };
+    table[OpcodeKind::LD_H_B] = Opcode { "LD H, B", 1, 1, ld_h_b };
+    table[OpcodeKind::LD_H_C] = Opcode { "LD H, C", 1, 1, ld_h_c };
+    table[OpcodeKind::LD_H_D] = Opcode { "LD H, D", 1, 1, ld_h_d };
+    table[OpcodeKind::LD_H_E] = Opcode { "LD H, E", 1, 1, ld_h_e };
+    table[OpcodeKind::LD_H_H] = Opcode { "LD H, H", 1, 1, ld_h_h };
+    table[OpcodeKind::LD_H_L] = Opcode { "LD H, L", 1, 1, ld_h_l };
+    table[OpcodeKind::LD_H_A] = Opcode { "LD H, A", 1, 1, ld_h_a };
+    table[OpcodeKind::LD_L_B] = Opcode { "LD L, B", 1, 1, ld_l_b };
+    table[OpcodeKind::LD_L_C] = Opcode { "LD L, C", 1, 1, ld_l_c };
+    table[OpcodeKind::LD_L_D] = Opcode { "LD L, D", 1, 1, ld_l_d };
+    table[OpcodeKind::LD_L_E] = Opcode { "LD L, E", 1, 1, ld_l_e };
+    table[OpcodeKind::LD_L_H] = Opcode { "LD L, H", 1, 1, ld_l_h };
+    table[OpcodeKind::LD_L_L] = Opcode { "LD L, L", 1, 1, ld_l_l };
+    table[OpcodeKind::LD_L_A] = Opcode { "LD L, A", 1, 1, ld_l_a };
+    table[OpcodeKind::LD_A_B] = Opcode { "LD A, B", 1, 1, ld_a_b };
+    table[OpcodeKind::LD_A_C] = Opcode { "LD A, C", 1, 1, ld_a_c };
+    table[OpcodeKind::LD_A_D] = Opcode { "LD A, D", 1, 1, ld_a_d };
+    table[OpcodeKind::LD_A_E] = Opcode { "LD A, E", 1, 1, ld_a_e };
+    table[OpcodeKind::LD_A_H] = Opcode { "LD A, H", 1, 1, ld_a_h };
+    table[OpcodeKind::LD_A_L] = Opcode { "LD A, L", 1, 1, ld_a_l };
+    table[OpcodeKind::LD_A_A] = Opcode { "LD A, A", 1, 1, ld_a_a };
     table[OpcodeKind::LD_B_N] = Opcode { "LD B, n", 2, 2, ld_b_n };
     table[OpcodeKind::LD_C_N] = Opcode { "LD C, n", 2, 2, ld_c_n };
     table[OpcodeKind::LD_D_N] = Opcode { "LD D, n", 2, 2, ld_d_n };
