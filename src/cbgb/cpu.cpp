@@ -83,6 +83,21 @@ enum OpcodeKind : uint8_t {
     LD_HL_H = 0x74,
     LD_HL_L = 0x75,
     LD_HL_A = 0x77,
+    LD_HL_N = 0x36,
+    LD_A_BC = 0x0A,
+    LD_A_DE = 0x1A,
+    LD_BC_A = 0x02,
+    LD_DE_A = 0x12,
+    LD_A_NN = 0xFA,
+    LD_NN_A = 0xEA,
+    LDH_A_C = 0xF2,
+    LDH_C_A = 0xE2,
+    LDH_A_N = 0xF0,
+    LDH_N_A = 0xE0,
+    LD_A_HLD = 0x3A,
+    LD_HLD_A = 0x32,
+    LD_A_HLI = 0x2A,
+    LD_HLI_A = 0x22,
 };
 
 static inline void ld_b_b(Sm83State& cpu)
@@ -434,6 +449,87 @@ static inline void ld_hl_a(Sm83State& cpu)
     cpu.memory.write(cpu.hl, cpu.a);
 }
 
+static inline void ld_hl_n(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.hl, cpu.memory.read(cpu.pc++));
+}
+
+static inline void ld_a_bc(Sm83State& cpu)
+{
+    cpu.a = cpu.memory.read(cpu.bc);
+}
+
+static inline void ld_a_de(Sm83State& cpu)
+{
+    cpu.a = cpu.memory.read(cpu.de);
+}
+
+static inline void ld_bc_a(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.bc, cpu.a);
+}
+
+static inline void ld_de_a(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.de, cpu.a);
+}
+
+static inline void ld_a_nn(Sm83State& cpu)
+{
+    uint8_t lsb = cpu.memory.read(cpu.pc++);
+    uint8_t msb = cpu.memory.read(cpu.pc++);
+    cpu.a = cpu.memory.read(static_cast<uint16_t>((lsb << 8) | msb));
+}
+
+static inline void ld_nn_a(Sm83State& cpu)
+{
+    uint8_t lsb = cpu.memory.read(cpu.pc++);
+    uint8_t msb = cpu.memory.read(cpu.pc++);
+    cpu.memory.write(static_cast<uint16_t>((lsb << 8) | msb), cpu.a);
+}
+
+static inline void ldh_a_c(Sm83State& cpu)
+{
+    cpu.a = cpu.memory.read(static_cast<uint16_t>((cpu.c << 8) | 0xFF));
+}
+
+static inline void ldh_c_a(Sm83State& cpu)
+{
+    cpu.memory.write(static_cast<uint16_t>((cpu.c << 8) | 0xFF), cpu.a);
+}
+
+static inline void ldh_a_n(Sm83State& cpu)
+{
+    uint8_t lsb = cpu.memory.read(cpu.pc++);
+    cpu.a = cpu.memory.read(static_cast<uint16_t>((lsb << 8) | 0xFF));
+}
+
+static inline void ldh_n_a(Sm83State& cpu)
+{
+    uint8_t lsb = cpu.memory.read(cpu.pc++);
+    cpu.memory.write(static_cast<uint16_t>((lsb << 8) | 0xFF), cpu.a);
+}
+
+static inline void ld_a_hld(Sm83State& cpu)
+{
+    cpu.a = cpu.memory.read(cpu.hl--);
+}
+
+static inline void ld_hld_a(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.hl--, cpu.a);
+}
+
+static inline void ld_a_hli(Sm83State& cpu)
+{
+    cpu.a = cpu.memory.read(cpu.hl++);
+}
+
+static inline void ld_hli_a(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.hl++, cpu.a);
+}
+
 struct Opcode final {
     std::string_view mnemonic;
     unsigned int length;
@@ -514,6 +610,21 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
     table[OpcodeKind::LD_HL_B] = Opcode { "LD (HL), H", 1, 2, ld_hl_h };
     table[OpcodeKind::LD_HL_B] = Opcode { "LD (HL), L", 1, 2, ld_hl_l };
     table[OpcodeKind::LD_HL_B] = Opcode { "LD (HL), A", 1, 2, ld_hl_a };
+    table[OpcodeKind::LD_HL_N] = Opcode { "LD (HL), n", 2, 3, ld_hl_n };
+    table[OpcodeKind::LD_A_BC] = Opcode { "LD A, (BC)", 1, 2, ld_a_bc };
+    table[OpcodeKind::LD_A_DE] = Opcode { "LD A, (DE)", 1, 2, ld_a_de };
+    table[OpcodeKind::LD_BC_A] = Opcode { "LD (BC), A", 1, 2, ld_bc_a };
+    table[OpcodeKind::LD_DE_A] = Opcode { "LD (DE), A", 1, 2, ld_de_a };
+    table[OpcodeKind::LD_A_NN] = Opcode { "LD A, (NN)", 3, 4, ld_a_nn };
+    table[OpcodeKind::LD_NN_A] = Opcode { "LD (NN), A", 3, 4, ld_nn_a };
+    table[OpcodeKind::LDH_A_C] = Opcode { "LDH A, (C)", 1, 2, ldh_a_c };
+    table[OpcodeKind::LDH_C_A] = Opcode { "LDH (C), A", 1, 2, ldh_c_a };
+    table[OpcodeKind::LDH_A_N] = Opcode { "LDH A, (n)", 2, 3, ldh_a_n };
+    table[OpcodeKind::LDH_N_A] = Opcode { "LDH (n), A", 2, 3, ldh_n_a };
+    table[OpcodeKind::LD_A_HLD] = Opcode { "LD A, (HL-)", 1, 2, ld_a_hld };
+    table[OpcodeKind::LD_HLD_A] = Opcode { "LD (HL-), A", 1, 2, ld_hld_a };
+    table[OpcodeKind::LD_A_HLI] = Opcode { "LD A, (HL+)", 1, 2, ld_a_hli };
+    table[OpcodeKind::LD_HLI_A] = Opcode { "LD (HL+), A", 1, 2, ld_hli_a };
     return table;
 }
 constexpr std::array<Opcode, 256> opcode_jump_table = new_opcode_jump_table();
