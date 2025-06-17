@@ -98,6 +98,21 @@ enum OpcodeKind : uint8_t {
     LD_HLD_A = 0x32,
     LD_A_HLI = 0x2A,
     LD_HLI_A = 0x22,
+    LD_BC_NN = 0x01,
+    LD_DE_NN = 0x11,
+    LD_HL_NN = 0x21,
+    LD_SP_NN = 0x31,
+    LD_NN_SP = 0x08,
+    LD_SP_HL = 0xF9,
+    PUSH_BC = 0xC5,
+    PUSH_DE = 0xD5,
+    PUSH_HL = 0xE5,
+    PUSH_AF = 0xF5,
+    POP_BC = 0xC1,
+    POP_DE = 0xD1,
+    POP_HL = 0xE1,
+    POP_AF = 0xF1,
+    LD_HL_SPO = 0xF8,
 };
 
 static inline void ld_b_b(Sm83State& cpu)
@@ -530,6 +545,104 @@ static inline void ld_hli_a(Sm83State& cpu)
     cpu.memory.write(cpu.hl++, cpu.a);
 }
 
+static inline void ld_bc_nn(Sm83State& cpu)
+{
+    cpu.bc.high = cpu.memory.read(cpu.pc++);
+    cpu.bc.low = cpu.memory.read(cpu.pc++);
+}
+
+static inline void ld_de_nn(Sm83State& cpu)
+{
+    cpu.de.high = cpu.memory.read(cpu.pc++);
+    cpu.de.low = cpu.memory.read(cpu.pc++);
+}
+
+static inline void ld_hl_nn(Sm83State& cpu)
+{
+    cpu.hl.high = cpu.memory.read(cpu.pc++);
+    cpu.hl.low = cpu.memory.read(cpu.pc++);
+}
+
+static inline void ld_sp_nn(Sm83State& cpu)
+{
+    uint8_t lsb = cpu.memory.read(cpu.pc++);
+    uint8_t msb = cpu.memory.read(cpu.pc++);
+    cpu.sp = static_cast<uint16_t>((lsb << 8) | msb);
+}
+
+static inline void ld_nn_sp(Sm83State& cpu)
+{
+    uint8_t lsb = cpu.memory.read(cpu.pc++);
+    uint8_t msb = cpu.memory.read(cpu.pc++);
+    uint16_t addr = static_cast<uint16_t>((lsb << 8) | msb);
+    cpu.memory.write(addr, static_cast<uint8_t>((cpu.sp & 0xF0) >> 8));
+    cpu.memory.write(addr, static_cast<uint8_t>(cpu.sp & 0x0F));
+}
+
+static inline void ld_sp_hl(Sm83State& cpu)
+{
+    cpu.sp = cpu.hl;
+}
+
+static inline void push_bc(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.sp--, cpu.bc.low);
+    cpu.memory.write(cpu.sp--, cpu.bc.high);
+}
+
+static inline void push_de(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.sp--, cpu.de.low);
+    cpu.memory.write(cpu.sp--, cpu.de.high);
+}
+
+static inline void push_hl(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.sp--, cpu.hl.low);
+    cpu.memory.write(cpu.sp--, cpu.hl.high);
+}
+
+static inline void push_af(Sm83State& cpu)
+{
+    cpu.memory.write(cpu.sp--, cpu.af.low);
+    cpu.memory.write(cpu.sp--, cpu.af.high);
+}
+
+static inline void pop_bc(Sm83State& cpu)
+{
+    cpu.bc.high = cpu.memory.read(cpu.sp++);
+    cpu.bc.low = cpu.memory.read(cpu.sp++);
+}
+
+static inline void pop_de(Sm83State& cpu)
+{
+    cpu.de.high = cpu.memory.read(cpu.sp++);
+    cpu.de.low = cpu.memory.read(cpu.sp++);
+}
+
+static inline void pop_hl(Sm83State& cpu)
+{
+    cpu.hl.high = cpu.memory.read(cpu.sp++);
+    cpu.hl.low = cpu.memory.read(cpu.sp++);
+}
+
+static inline void pop_af(Sm83State& cpu)
+{
+    cpu.af.high = cpu.memory.read(cpu.sp++);
+    cpu.af.low = cpu.memory.read(cpu.sp++);
+}
+
+void ld_hl_spo(Sm83State& cpu)
+{
+    uint8_t offset = cpu.memory.read(cpu.pc++);
+    uint16_t result = cpu.sp + offset;
+    cpu.hl = result;
+    cpu.fz = 0;
+    cpu.fn = 0;
+    cpu.fh = ((((cpu.sp & 0x0F) + (offset + 0x0F)) & 0x10) == 0x10) ? 1 : 0;
+    cpu.fc = (result + offset > 0xFFFF) ? 1 : 0;
+}
+
 struct Opcode final {
     std::string_view mnemonic;
     unsigned int length;
@@ -625,6 +738,21 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
     table[OpcodeKind::LD_HLD_A] = Opcode { "LD (HL-), A", 1, 2, ld_hld_a };
     table[OpcodeKind::LD_A_HLI] = Opcode { "LD A, (HL+)", 1, 2, ld_a_hli };
     table[OpcodeKind::LD_HLI_A] = Opcode { "LD (HL+), A", 1, 2, ld_hli_a };
+    table[OpcodeKind::LD_BC_NN] = Opcode { "LD BC, nn", 3, 3, ld_bc_nn };
+    table[OpcodeKind::LD_DE_NN] = Opcode { "LD DE, nn", 3, 3, ld_de_nn };
+    table[OpcodeKind::LD_HL_NN] = Opcode { "LD HL, nn", 3, 3, ld_hl_nn };
+    table[OpcodeKind::LD_SP_NN] = Opcode { "LD SP, nn", 3, 3, ld_sp_nn };
+    table[OpcodeKind::LD_NN_SP] = Opcode { "LD (nn), SP", 3, 5, ld_nn_sp };
+    table[OpcodeKind::LD_SP_HL] = Opcode { "LD SP, HL", 1, 2, ld_sp_hl };
+    table[OpcodeKind::PUSH_BC] = Opcode { "PUSH BC", 1, 4, push_bc };
+    table[OpcodeKind::PUSH_DE] = Opcode { "PUSH DE", 1, 4, push_de };
+    table[OpcodeKind::PUSH_HL] = Opcode { "PUSH HL", 1, 4, push_hl };
+    table[OpcodeKind::PUSH_AF] = Opcode { "PUSH AF", 1, 4, push_af };
+    table[OpcodeKind::POP_BC] = Opcode { "POP BC", 1, 3, pop_bc };
+    table[OpcodeKind::POP_DE] = Opcode { "POP DE", 1, 3, pop_de };
+    table[OpcodeKind::POP_HL] = Opcode { "POP HL", 1, 3, pop_hl };
+    table[OpcodeKind::POP_AF] = Opcode { "POP AF", 1, 3, pop_af };
+    table[OpcodeKind::LD_HL_SPO] = Opcode { "LD HL, SP+e", 2, 3, ld_hl_spo };
     return table;
 }
 constexpr std::array<Opcode, 256> opcode_jump_table = new_opcode_jump_table();
