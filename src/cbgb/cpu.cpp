@@ -113,464 +113,482 @@ enum OpcodeKind : uint8_t {
     POP_HL = 0xE1,
     POP_AF = 0xF1,
     LD_HL_SPO = 0xF8,
+    ADD_B = 0x80,
+    ADD_C = 0x81,
+    ADD_D = 0x82,
+    ADD_E = 0x83,
+    ADD_H = 0x84,
+    ADD_L = 0x85,
+    ADD_A = 0x87,
+    ADD_HL = 0x86,
+    ADD_N = 0xC6,
+    ADC_B = 0x88,
+    ADC_C = 0x89,
+    ADC_D = 0x8A,
+    ADC_E = 0x8B,
+    ADC_H = 0x8C,
+    ADC_L = 0x8D,
+    ADC_A = 0x8F,
+    ADC_HL = 0x8E,
+    ADC_N = 0xCE,
 };
 
-static inline void ld_b_b(Sm83State& cpu)
+void ld_b_b(Sm83State& cpu)
 {
     cpu.b = cpu.b;
 }
 
-static inline void ld_b_c(Sm83State& cpu)
+void ld_b_c(Sm83State& cpu)
 {
     cpu.b = cpu.c;
 }
 
-static inline void ld_b_d(Sm83State& cpu)
+void ld_b_d(Sm83State& cpu)
 {
     cpu.b = cpu.d;
 }
 
-static inline void ld_b_e(Sm83State& cpu)
+void ld_b_e(Sm83State& cpu)
 {
     cpu.b = cpu.e;
 }
 
-static inline void ld_b_h(Sm83State& cpu)
+void ld_b_h(Sm83State& cpu)
 {
     cpu.b = cpu.h;
 }
 
-static inline void ld_b_l(Sm83State& cpu)
+void ld_b_l(Sm83State& cpu)
 {
     cpu.b = cpu.l;
 }
 
-static inline void ld_b_a(Sm83State& cpu)
+void ld_b_a(Sm83State& cpu)
 {
     cpu.b = cpu.a;
 }
 
-static inline void ld_c_b(Sm83State& cpu)
+void ld_c_b(Sm83State& cpu)
 {
     cpu.c = cpu.b;
 }
 
-static inline void ld_c_c(Sm83State& cpu)
+void ld_c_c(Sm83State& cpu)
 {
     cpu.c = cpu.c;
 }
 
-static inline void ld_c_d(Sm83State& cpu)
+void ld_c_d(Sm83State& cpu)
 {
     cpu.c = cpu.d;
 }
 
-static inline void ld_c_e(Sm83State& cpu)
+void ld_c_e(Sm83State& cpu)
 {
     cpu.c = cpu.e;
 }
 
-static inline void ld_c_h(Sm83State& cpu)
+void ld_c_h(Sm83State& cpu)
 {
     cpu.c = cpu.h;
 }
 
-static inline void ld_c_l(Sm83State& cpu)
+void ld_c_l(Sm83State& cpu)
 {
     cpu.c = cpu.l;
 }
 
-static inline void ld_c_a(Sm83State& cpu)
+void ld_c_a(Sm83State& cpu)
 {
     cpu.c = cpu.a;
 }
 
-static inline void ld_d_b(Sm83State& cpu)
+void ld_d_b(Sm83State& cpu)
 {
     cpu.d = cpu.b;
 }
 
-static inline void ld_d_c(Sm83State& cpu)
+void ld_d_c(Sm83State& cpu)
 {
     cpu.d = cpu.c;
 }
 
-static inline void ld_d_d(Sm83State& cpu)
+void ld_d_d(Sm83State& cpu)
 {
     cpu.d = cpu.d;
 }
 
-static inline void ld_d_e(Sm83State& cpu)
+void ld_d_e(Sm83State& cpu)
 {
     cpu.d = cpu.e;
 }
 
-static inline void ld_d_h(Sm83State& cpu)
+void ld_d_h(Sm83State& cpu)
 {
     cpu.d = cpu.h;
 }
 
-static inline void ld_d_l(Sm83State& cpu)
+void ld_d_l(Sm83State& cpu)
 {
     cpu.d = cpu.l;
 }
 
-static inline void ld_d_a(Sm83State& cpu)
+void ld_d_a(Sm83State& cpu)
 {
     cpu.d = cpu.a;
 }
 
-static inline void ld_e_b(Sm83State& cpu)
+void ld_e_b(Sm83State& cpu)
 {
     cpu.e = cpu.b;
 }
 
-static inline void ld_e_c(Sm83State& cpu)
+void ld_e_c(Sm83State& cpu)
 {
     cpu.e = cpu.c;
 }
 
-static inline void ld_e_d(Sm83State& cpu)
+void ld_e_d(Sm83State& cpu)
 {
     cpu.e = cpu.d;
 }
 
-static inline void ld_e_e(Sm83State& cpu)
+void ld_e_e(Sm83State& cpu)
 {
     cpu.e = cpu.e;
 }
 
-static inline void ld_e_h(Sm83State& cpu)
+void ld_e_h(Sm83State& cpu)
 {
     cpu.e = cpu.h;
 }
 
-static inline void ld_e_l(Sm83State& cpu)
+void ld_e_l(Sm83State& cpu)
 {
     cpu.e = cpu.l;
 }
 
-static inline void ld_e_a(Sm83State& cpu)
+void ld_e_a(Sm83State& cpu)
 {
     cpu.e = cpu.a;
 }
 
-static inline void ld_h_b(Sm83State& cpu)
+void ld_h_b(Sm83State& cpu)
 {
     cpu.h = cpu.b;
 }
 
-static inline void ld_h_c(Sm83State& cpu)
+void ld_h_c(Sm83State& cpu)
 {
     cpu.h = cpu.c;
 }
 
-static inline void ld_h_d(Sm83State& cpu)
+void ld_h_d(Sm83State& cpu)
 {
     cpu.h = cpu.d;
 }
 
-static inline void ld_h_e(Sm83State& cpu)
+void ld_h_e(Sm83State& cpu)
 {
     cpu.h = cpu.e;
 }
 
-static inline void ld_h_h(Sm83State& cpu)
+void ld_h_h(Sm83State& cpu)
 {
     cpu.h = cpu.h;
 }
 
-static inline void ld_h_l(Sm83State& cpu)
+void ld_h_l(Sm83State& cpu)
 {
     cpu.h = cpu.l;
 }
 
-static inline void ld_h_a(Sm83State& cpu)
+void ld_h_a(Sm83State& cpu)
 {
     cpu.h = cpu.a;
 }
 
-static inline void ld_l_b(Sm83State& cpu)
+void ld_l_b(Sm83State& cpu)
 {
     cpu.l = cpu.b;
 }
 
-static inline void ld_l_c(Sm83State& cpu)
+void ld_l_c(Sm83State& cpu)
 {
     cpu.l = cpu.c;
 }
 
-static inline void ld_l_d(Sm83State& cpu)
+void ld_l_d(Sm83State& cpu)
 {
     cpu.l = cpu.d;
 }
 
-static inline void ld_l_e(Sm83State& cpu)
+void ld_l_e(Sm83State& cpu)
 {
     cpu.l = cpu.e;
 }
 
-static inline void ld_l_h(Sm83State& cpu)
+void ld_l_h(Sm83State& cpu)
 {
     cpu.l = cpu.h;
 }
 
-static inline void ld_l_l(Sm83State& cpu)
+void ld_l_l(Sm83State& cpu)
 {
     cpu.l = cpu.l;
 }
 
-static inline void ld_l_a(Sm83State& cpu)
+void ld_l_a(Sm83State& cpu)
 {
     cpu.l = cpu.a;
 }
 
-static inline void ld_a_b(Sm83State& cpu)
+void ld_a_b(Sm83State& cpu)
 {
     cpu.a = cpu.b;
 }
 
-static inline void ld_a_c(Sm83State& cpu)
+void ld_a_c(Sm83State& cpu)
 {
     cpu.a = cpu.c;
 }
 
-static inline void ld_a_d(Sm83State& cpu)
+void ld_a_d(Sm83State& cpu)
 {
     cpu.a = cpu.d;
 }
 
-static inline void ld_a_e(Sm83State& cpu)
+void ld_a_e(Sm83State& cpu)
 {
     cpu.a = cpu.e;
 }
 
-static inline void ld_a_h(Sm83State& cpu)
+void ld_a_h(Sm83State& cpu)
 {
     cpu.a = cpu.h;
 }
 
-static inline void ld_a_l(Sm83State& cpu)
+void ld_a_l(Sm83State& cpu)
 {
     cpu.a = cpu.l;
 }
 
-static inline void ld_a_a(Sm83State& cpu)
+void ld_a_a(Sm83State& cpu)
 {
     cpu.a = cpu.a;
 }
 
-static inline void ld_b_n(Sm83State& cpu)
+void ld_b_n(Sm83State& cpu)
 {
     cpu.b = cpu.memory.read(cpu.pc++);
 }
 
-static inline void ld_c_n(Sm83State& cpu)
+void ld_c_n(Sm83State& cpu)
 {
     cpu.c = cpu.memory.read(cpu.pc++);
 }
-static inline void ld_d_n(Sm83State& cpu)
+void ld_d_n(Sm83State& cpu)
 {
     cpu.d = cpu.memory.read(cpu.pc++);
 }
 
-static inline void ld_e_n(Sm83State& cpu)
+void ld_e_n(Sm83State& cpu)
 {
     cpu.e = cpu.memory.read(cpu.pc++);
 }
 
-static inline void ld_h_n(Sm83State& cpu)
+void ld_h_n(Sm83State& cpu)
 {
     cpu.h = cpu.memory.read(cpu.pc++);
 }
 
-static inline void ld_l_n(Sm83State& cpu)
+void ld_l_n(Sm83State& cpu)
 {
     cpu.l = cpu.memory.read(cpu.pc++);
 }
 
-static inline void ld_a_n(Sm83State& cpu)
+void ld_a_n(Sm83State& cpu)
 {
     cpu.a = cpu.memory.read(cpu.pc++);
 }
 
-static inline void ld_b_hl(Sm83State& cpu)
+void ld_b_hl(Sm83State& cpu)
 {
     cpu.b = cpu.memory.read(cpu.hl);
 }
 
-static inline void ld_c_hl(Sm83State& cpu)
+void ld_c_hl(Sm83State& cpu)
 {
     cpu.c = cpu.memory.read(cpu.hl);
 }
 
-static inline void ld_d_hl(Sm83State& cpu)
+void ld_d_hl(Sm83State& cpu)
 {
     cpu.d = cpu.memory.read(cpu.hl);
 }
 
-static inline void ld_e_hl(Sm83State& cpu)
+void ld_e_hl(Sm83State& cpu)
 {
     cpu.e = cpu.memory.read(cpu.hl);
 }
 
-static inline void ld_h_hl(Sm83State& cpu)
+void ld_h_hl(Sm83State& cpu)
 {
     cpu.h = cpu.memory.read(cpu.hl);
 }
 
-static inline void ld_l_hl(Sm83State& cpu)
+void ld_l_hl(Sm83State& cpu)
 {
     cpu.l = cpu.memory.read(cpu.hl);
 }
 
-static inline void ld_a_hl(Sm83State& cpu)
+void ld_a_hl(Sm83State& cpu)
 {
     cpu.a = cpu.memory.read(cpu.hl);
 }
 
-static inline void ld_hl_b(Sm83State& cpu)
+void ld_hl_b(Sm83State& cpu)
 {
     cpu.memory.write(cpu.hl, cpu.b);
 }
 
-static inline void ld_hl_c(Sm83State& cpu)
+void ld_hl_c(Sm83State& cpu)
 {
     cpu.memory.write(cpu.hl, cpu.c);
 }
 
-static inline void ld_hl_d(Sm83State& cpu)
+void ld_hl_d(Sm83State& cpu)
 {
     cpu.memory.write(cpu.hl, cpu.d);
 }
 
-static inline void ld_hl_e(Sm83State& cpu)
+void ld_hl_e(Sm83State& cpu)
 {
     cpu.memory.write(cpu.hl, cpu.e);
 }
 
-static inline void ld_hl_h(Sm83State& cpu)
+void ld_hl_h(Sm83State& cpu)
 {
     cpu.memory.write(cpu.hl, cpu.h);
 }
 
-static inline void ld_hl_l(Sm83State& cpu)
+void ld_hl_l(Sm83State& cpu)
 {
     cpu.memory.write(cpu.hl, cpu.l);
 }
 
-static inline void ld_hl_a(Sm83State& cpu)
+void ld_hl_a(Sm83State& cpu)
 {
     cpu.memory.write(cpu.hl, cpu.a);
 }
 
-static inline void ld_hl_n(Sm83State& cpu)
+void ld_hl_n(Sm83State& cpu)
 {
     cpu.memory.write(cpu.hl, cpu.memory.read(cpu.pc++));
 }
 
-static inline void ld_a_bc(Sm83State& cpu)
+void ld_a_bc(Sm83State& cpu)
 {
     cpu.a = cpu.memory.read(cpu.bc);
 }
 
-static inline void ld_a_de(Sm83State& cpu)
+void ld_a_de(Sm83State& cpu)
 {
     cpu.a = cpu.memory.read(cpu.de);
 }
 
-static inline void ld_bc_a(Sm83State& cpu)
+void ld_bc_a(Sm83State& cpu)
 {
     cpu.memory.write(cpu.bc, cpu.a);
 }
 
-static inline void ld_de_a(Sm83State& cpu)
+void ld_de_a(Sm83State& cpu)
 {
     cpu.memory.write(cpu.de, cpu.a);
 }
 
-static inline void ld_a_nn(Sm83State& cpu)
+void ld_a_nn(Sm83State& cpu)
 {
     uint8_t lsb = cpu.memory.read(cpu.pc++);
     uint8_t msb = cpu.memory.read(cpu.pc++);
     cpu.a = cpu.memory.read(static_cast<uint16_t>((lsb << 8) | msb));
 }
 
-static inline void ld_nn_a(Sm83State& cpu)
+void ld_nn_a(Sm83State& cpu)
 {
     uint8_t lsb = cpu.memory.read(cpu.pc++);
     uint8_t msb = cpu.memory.read(cpu.pc++);
     cpu.memory.write(static_cast<uint16_t>((lsb << 8) | msb), cpu.a);
 }
 
-static inline void ldh_a_c(Sm83State& cpu)
+void ldh_a_c(Sm83State& cpu)
 {
     cpu.a = cpu.memory.read(static_cast<uint16_t>((cpu.c << 8) | 0xFF));
 }
 
-static inline void ldh_c_a(Sm83State& cpu)
+void ldh_c_a(Sm83State& cpu)
 {
     cpu.memory.write(static_cast<uint16_t>((cpu.c << 8) | 0xFF), cpu.a);
 }
 
-static inline void ldh_a_n(Sm83State& cpu)
+void ldh_a_n(Sm83State& cpu)
 {
     uint8_t lsb = cpu.memory.read(cpu.pc++);
     cpu.a = cpu.memory.read(static_cast<uint16_t>((lsb << 8) | 0xFF));
 }
 
-static inline void ldh_n_a(Sm83State& cpu)
+void ldh_n_a(Sm83State& cpu)
 {
     uint8_t lsb = cpu.memory.read(cpu.pc++);
     cpu.memory.write(static_cast<uint16_t>((lsb << 8) | 0xFF), cpu.a);
 }
 
-static inline void ld_a_hld(Sm83State& cpu)
+void ld_a_hld(Sm83State& cpu)
 {
     cpu.a = cpu.memory.read(cpu.hl--);
 }
 
-static inline void ld_hld_a(Sm83State& cpu)
+void ld_hld_a(Sm83State& cpu)
 {
     cpu.memory.write(cpu.hl--, cpu.a);
 }
 
-static inline void ld_a_hli(Sm83State& cpu)
+void ld_a_hli(Sm83State& cpu)
 {
     cpu.a = cpu.memory.read(cpu.hl++);
 }
 
-static inline void ld_hli_a(Sm83State& cpu)
+void ld_hli_a(Sm83State& cpu)
 {
     cpu.memory.write(cpu.hl++, cpu.a);
 }
 
-static inline void ld_bc_nn(Sm83State& cpu)
+void ld_bc_nn(Sm83State& cpu)
 {
     cpu.bc.high = cpu.memory.read(cpu.pc++);
     cpu.bc.low = cpu.memory.read(cpu.pc++);
 }
 
-static inline void ld_de_nn(Sm83State& cpu)
+void ld_de_nn(Sm83State& cpu)
 {
     cpu.de.high = cpu.memory.read(cpu.pc++);
     cpu.de.low = cpu.memory.read(cpu.pc++);
 }
 
-static inline void ld_hl_nn(Sm83State& cpu)
+void ld_hl_nn(Sm83State& cpu)
 {
     cpu.hl.high = cpu.memory.read(cpu.pc++);
     cpu.hl.low = cpu.memory.read(cpu.pc++);
 }
 
-static inline void ld_sp_nn(Sm83State& cpu)
+void ld_sp_nn(Sm83State& cpu)
 {
     uint8_t lsb = cpu.memory.read(cpu.pc++);
     uint8_t msb = cpu.memory.read(cpu.pc++);
     cpu.sp = static_cast<uint16_t>((lsb << 8) | msb);
 }
 
-static inline void ld_nn_sp(Sm83State& cpu)
+void ld_nn_sp(Sm83State& cpu)
 {
     uint8_t lsb = cpu.memory.read(cpu.pc++);
     uint8_t msb = cpu.memory.read(cpu.pc++);
@@ -579,54 +597,54 @@ static inline void ld_nn_sp(Sm83State& cpu)
     cpu.memory.write(addr, static_cast<uint8_t>(cpu.sp & 0x0F));
 }
 
-static inline void ld_sp_hl(Sm83State& cpu)
+void ld_sp_hl(Sm83State& cpu)
 {
     cpu.sp = cpu.hl;
 }
 
-static inline void push_bc(Sm83State& cpu)
+void push_bc(Sm83State& cpu)
 {
     cpu.memory.write(cpu.sp--, cpu.bc.low);
     cpu.memory.write(cpu.sp--, cpu.bc.high);
 }
 
-static inline void push_de(Sm83State& cpu)
+void push_de(Sm83State& cpu)
 {
     cpu.memory.write(cpu.sp--, cpu.de.low);
     cpu.memory.write(cpu.sp--, cpu.de.high);
 }
 
-static inline void push_hl(Sm83State& cpu)
+void push_hl(Sm83State& cpu)
 {
     cpu.memory.write(cpu.sp--, cpu.hl.low);
     cpu.memory.write(cpu.sp--, cpu.hl.high);
 }
 
-static inline void push_af(Sm83State& cpu)
+void push_af(Sm83State& cpu)
 {
     cpu.memory.write(cpu.sp--, cpu.af.low);
     cpu.memory.write(cpu.sp--, cpu.af.high);
 }
 
-static inline void pop_bc(Sm83State& cpu)
+void pop_bc(Sm83State& cpu)
 {
     cpu.bc.high = cpu.memory.read(cpu.sp++);
     cpu.bc.low = cpu.memory.read(cpu.sp++);
 }
 
-static inline void pop_de(Sm83State& cpu)
+void pop_de(Sm83State& cpu)
 {
     cpu.de.high = cpu.memory.read(cpu.sp++);
     cpu.de.low = cpu.memory.read(cpu.sp++);
 }
 
-static inline void pop_hl(Sm83State& cpu)
+void pop_hl(Sm83State& cpu)
 {
     cpu.hl.high = cpu.memory.read(cpu.sp++);
     cpu.hl.low = cpu.memory.read(cpu.sp++);
 }
 
-static inline void pop_af(Sm83State& cpu)
+void pop_af(Sm83State& cpu)
 {
     cpu.af.high = cpu.memory.read(cpu.sp++);
     cpu.af.low = cpu.memory.read(cpu.sp++);
@@ -639,8 +657,142 @@ void ld_hl_spo(Sm83State& cpu)
     cpu.hl = result;
     cpu.fz = 0;
     cpu.fn = 0;
-    cpu.fh = ((((cpu.sp & 0x0F) + (offset + 0x0F)) & 0x10) == 0x10) ? 1 : 0;
-    cpu.fc = (result + offset > 0xFFFF) ? 1 : 0;
+    cpu.fh.condition_set(1, (((cpu.sp & 0x0F) + (offset + 0x0F)) & 0x10) == 0x10);
+    cpu.fc.condition_set(1, result < cpu.sp);
+}
+
+void add_r(Sm83State& cpu, Register<uint8_t>& reg)
+{
+    uint8_t result = cpu.a + reg;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + (reg + 0x0F)) & 0x10) == 0x10);
+    cpu.fc.condition_set(1, result < cpu.a);
+}
+
+void add_b(Sm83State& cpu)
+{
+    add_r(cpu, cpu.b);
+}
+
+void add_c(Sm83State& cpu)
+{
+    add_r(cpu, cpu.c);
+}
+
+void add_d(Sm83State& cpu)
+{
+    add_r(cpu, cpu.d);
+}
+
+void add_e(Sm83State& cpu)
+{
+    add_r(cpu, cpu.e);
+}
+
+void add_h(Sm83State& cpu)
+{
+    add_r(cpu, cpu.h);
+}
+
+void add_l(Sm83State& cpu)
+{
+    add_r(cpu, cpu.l);
+}
+
+void add_a(Sm83State& cpu)
+{
+    add_r(cpu, cpu.a);
+}
+
+void add_hl(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.hl);
+    uint8_t result = cpu.a + value;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + ((value) + 0x0F)) & 0x10) == 0x10);
+    cpu.fc.condition_set(1, result < cpu.a);
+}
+
+void add_n(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.pc++);
+    uint8_t result = cpu.a + value;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + (value + 0x0F)) & 0x10) == 0x10);
+    cpu.fc.condition_set(1, result < cpu.a);
+}
+
+void adc_r(Sm83State& cpu, Register<uint8_t>& reg)
+{
+    uint8_t result = cpu.a + reg + cpu.fc;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + ((reg + cpu.fc) + 0x0F)) & 0x10) == 0x10);
+    cpu.fc.condition_set(1, result < cpu.a);
+}
+
+void adc_b(Sm83State& cpu)
+{
+    adc_r(cpu, cpu.b);
+}
+
+void adc_c(Sm83State& cpu)
+{
+    adc_r(cpu, cpu.c);
+}
+
+void adc_d(Sm83State& cpu)
+{
+    adc_r(cpu, cpu.d);
+}
+
+void adc_e(Sm83State& cpu)
+{
+    adc_r(cpu, cpu.e);
+}
+
+void adc_h(Sm83State& cpu)
+{
+    adc_r(cpu, cpu.h);
+}
+
+void adc_l(Sm83State& cpu)
+{
+    adc_r(cpu, cpu.l);
+}
+
+void adc_a(Sm83State& cpu)
+{
+    adc_r(cpu, cpu.a);
+}
+
+void adc_hl(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.hl);
+    uint8_t result = cpu.a + value + cpu.fc;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + ((value + cpu.fc) + 0x0F)) & 0x10) == 0x10);
+    cpu.fc.condition_set(1, result < cpu.a);
+}
+
+void adc_n(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.pc++);
+    uint8_t result = cpu.a + value + cpu.fc;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + ((value + cpu.fc) + 0x0F)) & 0x10) == 0x10);
+    cpu.fc.condition_set(1, result < cpu.a);
 }
 
 struct Opcode final {
@@ -753,6 +905,24 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
     table[OpcodeKind::POP_HL] = Opcode { "POP HL", 1, 3, pop_hl };
     table[OpcodeKind::POP_AF] = Opcode { "POP AF", 1, 3, pop_af };
     table[OpcodeKind::LD_HL_SPO] = Opcode { "LD HL, SP+e", 2, 3, ld_hl_spo };
+    table[OpcodeKind::ADD_B] = Opcode { "ADD B", 1, 1, add_b };
+    table[OpcodeKind::ADD_C] = Opcode { "ADD C", 1, 1, add_c };
+    table[OpcodeKind::ADD_D] = Opcode { "ADD D", 1, 1, add_d };
+    table[OpcodeKind::ADD_E] = Opcode { "ADD E", 1, 1, add_e };
+    table[OpcodeKind::ADD_H] = Opcode { "ADD H", 1, 1, add_h };
+    table[OpcodeKind::ADD_L] = Opcode { "ADD L", 1, 1, add_l };
+    table[OpcodeKind::ADD_A] = Opcode { "ADD A", 1, 1, add_a };
+    table[OpcodeKind::ADD_HL] = Opcode { "ADD (HL)", 1, 2, add_hl };
+    table[OpcodeKind::ADD_N] = Opcode { "ADD n", 2, 2, add_n };
+    table[OpcodeKind::ADC_B] = Opcode { "ADC B", 1, 1, adc_b };
+    table[OpcodeKind::ADC_C] = Opcode { "ADC C", 1, 1, adc_c };
+    table[OpcodeKind::ADC_D] = Opcode { "ADC D", 1, 1, adc_d };
+    table[OpcodeKind::ADC_E] = Opcode { "ADC E", 1, 1, adc_e };
+    table[OpcodeKind::ADC_H] = Opcode { "ADC H", 1, 1, adc_h };
+    table[OpcodeKind::ADC_L] = Opcode { "ADC L", 1, 1, adc_l };
+    table[OpcodeKind::ADC_A] = Opcode { "ADC A", 1, 1, adc_a };
+    table[OpcodeKind::ADC_HL] = Opcode { "ADC (HL)", 1, 2, adc_hl };
+    table[OpcodeKind::ADC_N] = Opcode { "ADC n", 2, 2, adc_n };
     return table;
 }
 constexpr std::array<Opcode, 256> opcode_jump_table = new_opcode_jump_table();
