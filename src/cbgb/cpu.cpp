@@ -149,6 +149,15 @@ enum OpcodeKind : uint8_t {
     SBC_A = 0x9F,
     SBC_HL = 0x9E,
     SBC_N = 0xDE,
+    CP_B = 0xB8,
+    CP_C = 0xB9,
+    CP_D = 0xBA,
+    CP_E = 0xBB,
+    CP_H = 0xBC,
+    CP_L = 0xBD,
+    CP_A = 0xBF,
+    CP_HL = 0xBE,
+    CP_N = 0xFE,
 };
 
 enum Operation : int {
@@ -970,6 +979,70 @@ void sbc_n(Sm83State& cpu)
     cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
 }
 
+void cp_r(Sm83State& cpu, Register<uint8_t>& reg)
+{
+    uint8_t result = cpu.a - reg;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 1;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(cpu.a, reg));
+    cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
+}
+
+void cp_b(Sm83State& cpu)
+{
+    cp_r(cpu, cpu.b);
+}
+
+void cp_c(Sm83State& cpu)
+{
+    cp_r(cpu, cpu.c);
+}
+
+void cp_d(Sm83State& cpu)
+{
+    cp_r(cpu, cpu.d);
+}
+
+void cp_e(Sm83State& cpu)
+{
+    cp_r(cpu, cpu.e);
+}
+
+void cp_h(Sm83State& cpu)
+{
+    cp_r(cpu, cpu.h);
+}
+
+void cp_l(Sm83State& cpu)
+{
+    cp_r(cpu, cpu.l);
+}
+
+void cp_a(Sm83State& cpu)
+{
+    cp_r(cpu, cpu.a);
+}
+
+void cp_hl(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.hl);
+    uint8_t result = cpu.a - value;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 1;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(cpu.a, value));
+    cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
+}
+
+void cp_n(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.pc++);
+    uint8_t result = cpu.a - value;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 1;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(cpu.a, value));
+    cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
+}
+
 struct Opcode final {
     std::string_view mnemonic;
     unsigned int length;
@@ -1116,6 +1189,15 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
     table[OpcodeKind::SBC_A] = Opcode { "SBC A", 1, 1, sbc_a };
     table[OpcodeKind::SBC_HL] = Opcode { "SBC (HL)", 1, 2, sbc_hl };
     table[OpcodeKind::SBC_N] = Opcode { "SBC n", 2, 2, sbc_n };
+    table[OpcodeKind::CP_B] = Opcode { "CP B", 1, 1, cp_b };
+    table[OpcodeKind::CP_C] = Opcode { "CP C", 1, 1, cp_c };
+    table[OpcodeKind::CP_D] = Opcode { "CP D", 1, 1, cp_d };
+    table[OpcodeKind::CP_E] = Opcode { "CP E", 1, 1, cp_e };
+    table[OpcodeKind::CP_H] = Opcode { "CP H", 1, 1, cp_h };
+    table[OpcodeKind::CP_L] = Opcode { "CP L", 1, 1, cp_l };
+    table[OpcodeKind::CP_A] = Opcode { "CP A", 1, 1, cp_a };
+    table[OpcodeKind::CP_HL] = Opcode { "CP (HL)", 1, 2, cp_hl };
+    table[OpcodeKind::CP_N] = Opcode { "CP n", 2, 2, cp_n };
     return table;
 }
 constexpr std::array<Opcode, 256> opcode_jump_table = new_opcode_jump_table();
