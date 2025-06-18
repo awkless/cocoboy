@@ -166,6 +166,14 @@ enum OpcodeKind : uint8_t {
     INC_L = 0x2C,
     INC_A = 0x3C,
     INC_HL = 0x34,
+    DEC_B = 0x05,
+    DEC_C = 0x0D,
+    DEC_D = 0x15,
+    DEC_E = 0x1D,
+    DEC_H = 0x25,
+    DEC_L = 0x2D,
+    DEC_A = 0x3D,
+    DEC_HL = 0x35,
 };
 
 enum Operation : int {
@@ -187,7 +195,7 @@ constexpr bool is_carry(T result, T operand1)
 {
     if (kind == Operation::Add)
         return result < operand1;
-    else 
+    else
         return result > operand1;
 }
 
@@ -1104,6 +1112,58 @@ void inc_hl(Sm83State& cpu)
     cpu.fh.condition_set(1, is_half_carry<Operation::Add, uint8_t>(value, 1));
 }
 
+void dec_r(Sm83State& cpu, Register<uint8_t>& reg)
+{
+    --reg;
+    cpu.fz.condition_set(1, reg == 0);
+    cpu.fn = 0;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(reg + 1, 1));
+}
+
+void dec_b(Sm83State& cpu)
+{
+    dec_r(cpu, cpu.b);
+}
+
+void dec_c(Sm83State& cpu)
+{
+    dec_r(cpu, cpu.c);
+}
+
+void dec_d(Sm83State& cpu)
+{
+    dec_r(cpu, cpu.d);
+}
+
+void dec_e(Sm83State& cpu)
+{
+    dec_r(cpu, cpu.e);
+}
+
+void dec_h(Sm83State& cpu)
+{
+    dec_r(cpu, cpu.h);
+}
+
+void dec_l(Sm83State& cpu)
+{
+    dec_r(cpu, cpu.l);
+}
+
+void dec_a(Sm83State& cpu)
+{
+    dec_r(cpu, cpu.a);
+}
+
+void dec_hl(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.hl);
+    uint8_t result = value - 1;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 1;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(value, 1));
+}
+
 struct Opcode final {
     std::string_view mnemonic;
     unsigned int length;
@@ -1267,6 +1327,14 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
     table[OpcodeKind::INC_L] = Opcode { "INC L", 1, 1, inc_l };
     table[OpcodeKind::INC_A] = Opcode { "INC A", 1, 1, inc_a };
     table[OpcodeKind::INC_HL] = Opcode { "INC (HL)", 1, 3, inc_hl };
+    table[OpcodeKind::DEC_B] = Opcode { "DEC B", 1, 1, dec_b };
+    table[OpcodeKind::DEC_C] = Opcode { "DEC C", 1, 1, dec_c };
+    table[OpcodeKind::DEC_D] = Opcode { "DEC D", 1, 1, dec_d };
+    table[OpcodeKind::DEC_E] = Opcode { "DEC E", 1, 1, dec_e };
+    table[OpcodeKind::DEC_H] = Opcode { "DEC H", 1, 1, dec_h };
+    table[OpcodeKind::DEC_L] = Opcode { "DEC L", 1, 1, dec_l };
+    table[OpcodeKind::DEC_A] = Opcode { "DEC A", 1, 1, dec_a };
+    table[OpcodeKind::DEC_HL] = Opcode { "DEC (HL)", 1, 3, dec_hl };
     return table;
 }
 constexpr std::array<Opcode, 256> opcode_jump_table = new_opcode_jump_table();
