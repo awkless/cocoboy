@@ -131,7 +131,48 @@ enum OpcodeKind : uint8_t {
     ADC_A = 0x8F,
     ADC_HL = 0x8E,
     ADC_N = 0xCE,
+    SUB_B = 0x90,
+    SUB_C = 0x91,
+    SUB_D = 0x92,
+    SUB_E = 0x93,
+    SUB_H = 0x94,
+    SUB_L = 0x95,
+    SUB_A = 0x97,
+    SUB_HL = 0x96,
+    SUB_N = 0xD6,
+    SBC_B = 0x98,
+    SBC_C = 0x99,
+    SBC_D = 0x9A,
+    SBC_E = 0x9B,
+    SBC_H = 0x9C,
+    SBC_L = 0x9D,
+    SBC_A = 0x9F,
+    SBC_HL = 0x9E,
+    SBC_N = 0xDE,
 };
+
+enum Operation : int {
+    Add,
+    Sub,
+};
+
+template<Operation kind, typename T>
+constexpr bool is_half_carry(T operand1, T operand2)
+{
+    if (kind == Operation::Add)
+        return (((operand1 & 0x0F) + (operand2 & 0x0F)) & 0x10) == 0x10;
+    else
+        return (((operand1 & 0x0F) - (operand2 & 0x0F)) & 0x10) == 0x10;
+}
+
+template<Operation kind, typename T>
+constexpr bool is_carry(T result, T operand1)
+{
+    if (kind == Operation::Add)
+        return result < operand1;
+    else 
+        return result > operand1;
+}
 
 void ld_b_b(Sm83State& cpu)
 {
@@ -657,8 +698,8 @@ void ld_hl_spo(Sm83State& cpu)
     cpu.hl = result;
     cpu.fz = 0;
     cpu.fn = 0;
-    cpu.fh.condition_set(1, (((cpu.sp & 0x0F) + (offset + 0x0F)) & 0x10) == 0x10);
-    cpu.fc.condition_set(1, result < cpu.sp);
+    cpu.fh.condition_set(1, is_half_carry<Operation::Add, uint16_t>(cpu.sp, offset));
+    cpu.fc.condition_set(1, is_carry<Operation::Add, uint16_t>(result, cpu.sp));
 }
 
 void add_r(Sm83State& cpu, Register<uint8_t>& reg)
@@ -667,8 +708,8 @@ void add_r(Sm83State& cpu, Register<uint8_t>& reg)
     cpu.a = result;
     cpu.fz.condition_set(1, result == 0);
     cpu.fn = 0;
-    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + (reg + 0x0F)) & 0x10) == 0x10);
-    cpu.fc.condition_set(1, result < cpu.a);
+    cpu.fh.condition_set(1, is_half_carry<Operation::Add, uint8_t>(cpu.a, reg));
+    cpu.fc.condition_set(1, is_carry<Operation::Add, uint8_t>(result, cpu.a));
 }
 
 void add_b(Sm83State& cpu)
@@ -713,8 +754,8 @@ void add_hl(Sm83State& cpu)
     cpu.a = result;
     cpu.fz.condition_set(1, result == 0);
     cpu.fn = 0;
-    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + ((value) + 0x0F)) & 0x10) == 0x10);
-    cpu.fc.condition_set(1, result < cpu.a);
+    cpu.fh.condition_set(1, is_half_carry<Operation::Add, uint8_t>(cpu.a, value));
+    cpu.fc.condition_set(1, is_carry<Operation::Add, uint8_t>(result, cpu.a));
 }
 
 void add_n(Sm83State& cpu)
@@ -724,8 +765,8 @@ void add_n(Sm83State& cpu)
     cpu.a = result;
     cpu.fz.condition_set(1, result == 0);
     cpu.fn = 0;
-    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + (value + 0x0F)) & 0x10) == 0x10);
-    cpu.fc.condition_set(1, result < cpu.a);
+    cpu.fh.condition_set(1, is_half_carry<Operation::Add, uint8_t>(cpu.a, value));
+    cpu.fc.condition_set(1, is_carry<Operation::Add, uint8_t>(result, cpu.a));
 }
 
 void adc_r(Sm83State& cpu, Register<uint8_t>& reg)
@@ -734,8 +775,8 @@ void adc_r(Sm83State& cpu, Register<uint8_t>& reg)
     cpu.a = result;
     cpu.fz.condition_set(1, result == 0);
     cpu.fn = 0;
-    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + ((reg + cpu.fc) + 0x0F)) & 0x10) == 0x10);
-    cpu.fc.condition_set(1, result < cpu.a);
+    cpu.fh.condition_set(1, is_half_carry<Operation::Add, uint8_t>(cpu.a, reg + cpu.fc));
+    cpu.fc.condition_set(1, is_carry<Operation::Add, uint8_t>(result, cpu.a));
 }
 
 void adc_b(Sm83State& cpu)
@@ -780,8 +821,8 @@ void adc_hl(Sm83State& cpu)
     cpu.a = result;
     cpu.fz.condition_set(1, result == 0);
     cpu.fn = 0;
-    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + ((value + cpu.fc) + 0x0F)) & 0x10) == 0x10);
-    cpu.fc.condition_set(1, result < cpu.a);
+    cpu.fh.condition_set(1, is_half_carry<Operation::Add, uint8_t>(cpu.a, value + cpu.fc));
+    cpu.fc.condition_set(1, is_carry<Operation::Add, uint8_t>(result, cpu.a));
 }
 
 void adc_n(Sm83State& cpu)
@@ -791,8 +832,142 @@ void adc_n(Sm83State& cpu)
     cpu.a = result;
     cpu.fz.condition_set(1, result == 0);
     cpu.fn = 0;
-    cpu.fh.condition_set(1, (((cpu.a & 0x0F) + ((value + cpu.fc) + 0x0F)) & 0x10) == 0x10);
-    cpu.fc.condition_set(1, result < cpu.a);
+    cpu.fh.condition_set(1, is_half_carry<Operation::Add, uint8_t>(cpu.a, value + cpu.fc));
+    cpu.fc.condition_set(1, is_carry<Operation::Add, uint8_t>(result, cpu.a));
+}
+
+void sub_r(Sm83State& cpu, Register<uint8_t>& reg)
+{
+    uint8_t result = cpu.a - reg;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 1;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(cpu.a, reg));
+    cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
+}
+
+void sub_b(Sm83State& cpu)
+{
+    sub_r(cpu, cpu.b);
+}
+
+void sub_c(Sm83State& cpu)
+{
+    sub_r(cpu, cpu.c);
+}
+
+void sub_d(Sm83State& cpu)
+{
+    sub_r(cpu, cpu.d);
+}
+
+void sub_e(Sm83State& cpu)
+{
+    sub_r(cpu, cpu.e);
+}
+
+void sub_h(Sm83State& cpu)
+{
+    sub_r(cpu, cpu.h);
+}
+
+void sub_l(Sm83State& cpu)
+{
+    sub_r(cpu, cpu.l);
+}
+
+void sub_a(Sm83State& cpu)
+{
+    sub_r(cpu, cpu.a);
+}
+
+void sub_hl(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.hl);
+    uint8_t result = cpu.a - value;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 1;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(cpu.a, value));
+    cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
+}
+
+void sub_n(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.pc++);
+    uint8_t result = cpu.a - value;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 1;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(cpu.a, value));
+    cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
+}
+
+void sbc_r(Sm83State& cpu, Register<uint8_t>& reg)
+{
+    uint8_t result = cpu.a - reg - cpu.fc;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 1;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(cpu.a, reg - cpu.fc));
+    cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
+}
+
+void sbc_b(Sm83State& cpu)
+{
+    sbc_r(cpu, cpu.b);
+}
+
+void sbc_c(Sm83State& cpu)
+{
+    sbc_r(cpu, cpu.c);
+}
+
+void sbc_d(Sm83State& cpu)
+{
+    sbc_r(cpu, cpu.d);
+}
+
+void sbc_e(Sm83State& cpu)
+{
+    sbc_r(cpu, cpu.e);
+}
+
+void sbc_h(Sm83State& cpu)
+{
+    sbc_r(cpu, cpu.h);
+}
+
+void sbc_l(Sm83State& cpu)
+{
+    sbc_r(cpu, cpu.l);
+}
+
+void sbc_a(Sm83State& cpu)
+{
+    sbc_r(cpu, cpu.a);
+}
+
+void sbc_hl(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.hl);
+    uint8_t result = cpu.a - value - cpu.fc;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 1;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(cpu.a, value - cpu.fc));
+    cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
+}
+
+void sbc_n(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.pc++);
+    uint8_t result = cpu.a - value - cpu.fc;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 1;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(cpu.a, value - cpu.fc));
+    cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
 }
 
 struct Opcode final {
@@ -923,6 +1098,24 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
     table[OpcodeKind::ADC_A] = Opcode { "ADC A", 1, 1, adc_a };
     table[OpcodeKind::ADC_HL] = Opcode { "ADC (HL)", 1, 2, adc_hl };
     table[OpcodeKind::ADC_N] = Opcode { "ADC n", 2, 2, adc_n };
+    table[OpcodeKind::SUB_B] = Opcode { "SUB B", 1, 1, sub_b };
+    table[OpcodeKind::SUB_C] = Opcode { "SUB C", 1, 1, sub_c };
+    table[OpcodeKind::SUB_D] = Opcode { "SUB D", 1, 1, sub_d };
+    table[OpcodeKind::SUB_E] = Opcode { "SUB E", 1, 1, sub_e };
+    table[OpcodeKind::SUB_H] = Opcode { "SUB H", 1, 1, sub_h };
+    table[OpcodeKind::SUB_L] = Opcode { "SUB L", 1, 1, sub_l };
+    table[OpcodeKind::SUB_A] = Opcode { "SUB A", 1, 1, sub_a };
+    table[OpcodeKind::SUB_HL] = Opcode { "SUB (HL)", 1, 2, sub_hl };
+    table[OpcodeKind::SUB_N] = Opcode { "SUB n", 2, 2, sub_n };
+    table[OpcodeKind::SBC_B] = Opcode { "SBC B", 1, 1, sbc_b };
+    table[OpcodeKind::SBC_C] = Opcode { "SBC C", 1, 1, sbc_c };
+    table[OpcodeKind::SBC_D] = Opcode { "SBC D", 1, 1, sbc_d };
+    table[OpcodeKind::SBC_E] = Opcode { "SBC E", 1, 1, sbc_e };
+    table[OpcodeKind::SBC_H] = Opcode { "SBC H", 1, 1, sbc_h };
+    table[OpcodeKind::SBC_L] = Opcode { "SBC L", 1, 1, sbc_l };
+    table[OpcodeKind::SBC_A] = Opcode { "SBC A", 1, 1, sbc_a };
+    table[OpcodeKind::SBC_HL] = Opcode { "SBC (HL)", 1, 2, sbc_hl };
+    table[OpcodeKind::SBC_N] = Opcode { "SBC n", 2, 2, sbc_n };
     return table;
 }
 constexpr std::array<Opcode, 256> opcode_jump_table = new_opcode_jump_table();
