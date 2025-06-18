@@ -158,6 +158,14 @@ enum OpcodeKind : uint8_t {
     CP_A = 0xBF,
     CP_HL = 0xBE,
     CP_N = 0xFE,
+    INC_B = 0x04,
+    INC_C = 0x0C,
+    INC_D = 0x14,
+    INC_E = 0x1C,
+    INC_H = 0x24,
+    INC_L = 0x2C,
+    INC_A = 0x3C,
+    INC_HL = 0x34,
 };
 
 enum Operation : int {
@@ -1043,6 +1051,59 @@ void cp_n(Sm83State& cpu)
     cpu.fc.condition_set(1, is_carry<Operation::Sub, uint8_t>(result, cpu.a));
 }
 
+void inc_r(Sm83State& cpu, Register<uint8_t>& reg)
+{
+    ++reg;
+    cpu.fz.condition_set(1, reg == 0);
+    cpu.fn = 0;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Add, uint8_t>(reg - 1, 1));
+}
+
+void inc_b(Sm83State& cpu)
+{
+    inc_r(cpu, cpu.b);
+}
+
+void inc_c(Sm83State& cpu)
+{
+    inc_r(cpu, cpu.c);
+}
+
+void inc_d(Sm83State& cpu)
+{
+    inc_r(cpu, cpu.d);
+}
+
+void inc_e(Sm83State& cpu)
+{
+    inc_r(cpu, cpu.e);
+}
+
+void inc_h(Sm83State& cpu)
+{
+    inc_r(cpu, cpu.h);
+}
+
+void inc_l(Sm83State& cpu)
+{
+    inc_r(cpu, cpu.l);
+}
+
+void inc_a(Sm83State& cpu)
+{
+    inc_r(cpu, cpu.a);
+}
+
+void inc_hl(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.hl);
+    uint8_t result = value + 1;
+    cpu.memory.write(cpu.hl, result);
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh.condition_set(1, is_half_carry<Operation::Add, uint8_t>(value, 1));
+}
+
 struct Opcode final {
     std::string_view mnemonic;
     unsigned int length;
@@ -1198,6 +1259,14 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
     table[OpcodeKind::CP_A] = Opcode { "CP A", 1, 1, cp_a };
     table[OpcodeKind::CP_HL] = Opcode { "CP (HL)", 1, 2, cp_hl };
     table[OpcodeKind::CP_N] = Opcode { "CP n", 2, 2, cp_n };
+    table[OpcodeKind::INC_B] = Opcode { "INC B", 1, 1, inc_b };
+    table[OpcodeKind::INC_C] = Opcode { "INC C", 1, 1, inc_c };
+    table[OpcodeKind::INC_D] = Opcode { "INC D", 1, 1, inc_d };
+    table[OpcodeKind::INC_E] = Opcode { "INC E", 1, 1, inc_e };
+    table[OpcodeKind::INC_H] = Opcode { "INC H", 1, 1, inc_h };
+    table[OpcodeKind::INC_L] = Opcode { "INC L", 1, 1, inc_l };
+    table[OpcodeKind::INC_A] = Opcode { "INC A", 1, 1, inc_a };
+    table[OpcodeKind::INC_HL] = Opcode { "INC (HL)", 1, 3, inc_hl };
     return table;
 }
 constexpr std::array<Opcode, 256> opcode_jump_table = new_opcode_jump_table();
