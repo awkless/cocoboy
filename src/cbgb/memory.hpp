@@ -153,6 +153,14 @@ struct RegisterBitField final {
     {
         return (control >> position) & mask;
     }
+
+    void condition_set(T value, bool condition)
+    {
+        if (condition)
+            *this = value;
+        else
+            *this = 0;
+    }
 };
 
 /// @brief Hardware register pair.

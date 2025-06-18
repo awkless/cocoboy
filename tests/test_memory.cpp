@@ -38,6 +38,29 @@ TEST_CASE("RegisterBitField::operator T() const", "[register_bit_field]")
     REQUIRE(val3 == 0xF);
 }
 
+TEST_CASE("void RegisterBitField::condition_set(T value, bool condition)", "[register_bit_field]")
+{
+    cbgb::Register<uint8_t> reg(0x00);
+    cbgb::RegisterBitField<0, 1, uint8_t> bit1(reg);
+    cbgb::RegisterBitField<1, 3, uint8_t> bit2(reg);
+    cbgb::RegisterBitField<4, 4, uint8_t> bit3(reg);
+
+    uint8_t a = 0x0E;
+    uint8_t b = 0x02;
+    bit1.condition_set(1, (((a & 0x0F) + (b & 0x0F)) & 0x10) == 0x10);
+    REQUIRE(static_cast<uint8_t>(bit1) == 1);
+
+    a = 0xFF;
+    b = 0x01;
+    bit2.condition_set(2, static_cast<uint8_t>(a + b) < a);
+    REQUIRE(static_cast<uint8_t>(bit2) == 2);
+
+    a = 0x00;
+    b = 0xF0;
+    bit3.condition_set(3, a == b);
+    REQUIRE(static_cast<uint8_t>(bit3) == 0);
+}
+
 TEST_CASE("RegisterPair& RegisterPair::operator=(T val)", "[register_pair]")
 {
     cbgb::Register<uint8_t> reg1(0x00);
