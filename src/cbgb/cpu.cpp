@@ -201,6 +201,10 @@ enum OpcodeKind : uint8_t {
     OR_A = 0xB7,
     OR_HL = 0xB6,
     OR_N = 0xF6,
+    CCF = 0x3F,
+    SCF = 0x37,
+    DAA = 0x27,
+    CPL = 0x2F,
 };
 
 enum Operation : int {
@@ -1393,6 +1397,47 @@ void xor_n(Sm83State& cpu)
     cpu.fc = 0;
 }
 
+void ccf(Sm83State& cpu)
+{
+    cpu.fn = 0;
+    cpu.fh = 0;
+    cpu.fc = ~cpu.fc;
+}
+
+void scf(Sm83State& cpu)
+{
+    cpu.fn = 0;
+    cpu.fh = 0;
+    cpu.fc = 1;
+}
+
+void cpl(Sm83State& cpu)
+{
+    cpu.a = ~cpu.a;
+    cpu.fn = 1;
+    cpu.fh = 1;
+}
+
+// Adapted from https://ehaskins.com/2018-01-30%20Z80%20DAA/
+void daa(Sm83State& cpu)
+{
+    uint8_t correction = 0;
+    if (cpu.fh || (!cpu.fn && (cpu.a & 0x0F) > 0x09))
+        correction |= 0x06;
+
+    if (cpu.fc || (!cpu.fn && cpu.a > 0x99)) {
+        correction |= 0x60;
+        cpu.fc = 1;
+    }
+
+    cpu.a = cpu.a + (cpu.fn ? -correction : correction);
+    if (cpu.a == 0)
+        cpu.fz = 1;
+    else
+        cpu.fz = 0;
+    cpu.fh = 0;
+}
+
 struct Opcode final {
     std::string_view mnemonic;
     unsigned int length;
@@ -1591,6 +1636,10 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
     table[OpcodeKind::OR_A] = Opcode { "OR A", 1, 1, or_a };
     table[OpcodeKind::OR_HL] = Opcode { "OR (HL)", 1, 2, or_hl };
     table[OpcodeKind::OR_N] = Opcode { "OR n", 2, 2, or_n };
+    table[OpcodeKind::CCF] = Opcode { "CCF", 1, 1, ccf };
+    table[OpcodeKind::SCF] = Opcode { "SCF", 1, 1, scf };
+    table[OpcodeKind::DAA] = Opcode { "DAA", 1, 1, daa };
+    table[OpcodeKind::CPL] = Opcode { "CPL", 1, 1, cpl };
     return table;
 }
 constexpr std::array<Opcode, 256> opcode_jump_table = new_opcode_jump_table();
