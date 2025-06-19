@@ -174,6 +174,33 @@ enum OpcodeKind : uint8_t {
     DEC_L = 0x2D,
     DEC_A = 0x3D,
     DEC_HL = 0x35,
+    AND_B = 0xA0,
+    AND_C = 0xA1,
+    AND_D = 0xA2,
+    AND_E = 0xA3,
+    AND_H = 0xA4,
+    AND_L = 0xA5,
+    AND_A = 0xA7,
+    AND_HL = 0xA6,
+    AND_N = 0xE6,
+    XOR_B = 0xA8,
+    XOR_C = 0xA9,
+    XOR_D = 0xAA,
+    XOR_E = 0xAB,
+    XOR_H = 0xAC,
+    XOR_L = 0xAD,
+    XOR_A = 0xAF,
+    XOR_HL = 0xAE,
+    XOR_N = 0xEE,
+    OR_B = 0xB0,
+    OR_C = 0xB1,
+    OR_D = 0xB2,
+    OR_E = 0xB3,
+    OR_H = 0xB4,
+    OR_L = 0xB5,
+    OR_A = 0xB7,
+    OR_HL = 0xB6,
+    OR_N = 0xF6,
 };
 
 enum Operation : int {
@@ -1159,9 +1186,211 @@ void dec_hl(Sm83State& cpu)
 {
     uint8_t value = cpu.memory.read(cpu.hl);
     uint8_t result = value - 1;
+    cpu.memory.write(cpu.hl, result);
     cpu.fz.condition_set(1, result == 0);
     cpu.fn = 1;
     cpu.fh.condition_set(1, is_half_carry<Operation::Sub, uint8_t>(value, 1));
+}
+
+void and_r(Sm83State& cpu, Register<uint8_t>& reg)
+{
+    uint8_t result = cpu.a & reg;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh = 1;
+    cpu.fc = 0;
+}
+
+void and_b(Sm83State& cpu)
+{
+    and_r(cpu, cpu.b);
+}
+
+void and_c(Sm83State& cpu)
+{
+    and_r(cpu, cpu.c);
+}
+
+void and_d(Sm83State& cpu)
+{
+    and_r(cpu, cpu.d);
+}
+
+void and_e(Sm83State& cpu)
+{
+    and_r(cpu, cpu.e);
+}
+
+void and_h(Sm83State& cpu)
+{
+    and_r(cpu, cpu.h);
+}
+
+void and_l(Sm83State& cpu)
+{
+    and_r(cpu, cpu.l);
+}
+
+void and_a(Sm83State& cpu)
+{
+    and_r(cpu, cpu.a);
+}
+
+void and_hl(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.hl);
+    uint8_t result = cpu.a & value;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh = 1;
+    cpu.fc = 0;
+}
+
+void and_n(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.pc++);
+    uint8_t result = cpu.a & value;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh = 1;
+    cpu.fc = 0;
+}
+
+void or_r(Sm83State& cpu, Register<uint8_t>& reg)
+{
+    uint8_t result = cpu.a | reg;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh = 0;
+    cpu.fc = 0;
+}
+
+void or_b(Sm83State& cpu)
+{
+    or_r(cpu, cpu.b);
+}
+
+void or_c(Sm83State& cpu)
+{
+    or_r(cpu, cpu.c);
+}
+
+void or_d(Sm83State& cpu)
+{
+    or_r(cpu, cpu.d);
+}
+
+void or_e(Sm83State& cpu)
+{
+    or_r(cpu, cpu.e);
+}
+
+void or_h(Sm83State& cpu)
+{
+    or_r(cpu, cpu.h);
+}
+
+void or_l(Sm83State& cpu)
+{
+    or_r(cpu, cpu.l);
+}
+
+void or_a(Sm83State& cpu)
+{
+    or_r(cpu, cpu.a);
+}
+
+void or_hl(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.hl);
+    uint8_t result = cpu.a | value;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh = 0;
+    cpu.fc = 0;
+}
+
+void or_n(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.pc++);
+    uint8_t result = cpu.a | value;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh = 0;
+    cpu.fc = 0;
+}
+
+void xor_r(Sm83State& cpu, Register<uint8_t>& reg)
+{
+    uint8_t result = cpu.a ^ reg;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh = 0;
+    cpu.fc = 0;
+}
+
+void xor_b(Sm83State& cpu)
+{
+    xor_r(cpu, cpu.b);
+}
+
+void xor_c(Sm83State& cpu)
+{
+    xor_r(cpu, cpu.c);
+}
+
+void xor_d(Sm83State& cpu)
+{
+    xor_r(cpu, cpu.d);
+}
+
+void xor_e(Sm83State& cpu)
+{
+    xor_r(cpu, cpu.e);
+}
+
+void xor_h(Sm83State& cpu)
+{
+    xor_r(cpu, cpu.h);
+}
+
+void xor_l(Sm83State& cpu)
+{
+    xor_r(cpu, cpu.l);
+}
+
+void xor_a(Sm83State& cpu)
+{
+    xor_r(cpu, cpu.a);
+}
+
+void xor_hl(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.hl);
+    uint8_t result = cpu.a ^ value;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh = 0;
+    cpu.fc = 0;
+}
+
+void xor_n(Sm83State& cpu)
+{
+    uint8_t value = cpu.memory.read(cpu.pc++);
+    uint8_t result = cpu.a ^ value;
+    cpu.a = result;
+    cpu.fz.condition_set(1, result == 0);
+    cpu.fn = 0;
+    cpu.fh = 0;
+    cpu.fc = 0;
 }
 
 struct Opcode final {
@@ -1335,6 +1564,33 @@ constexpr std::array<Opcode, 256> new_opcode_jump_table()
     table[OpcodeKind::DEC_L] = Opcode { "DEC L", 1, 1, dec_l };
     table[OpcodeKind::DEC_A] = Opcode { "DEC A", 1, 1, dec_a };
     table[OpcodeKind::DEC_HL] = Opcode { "DEC (HL)", 1, 3, dec_hl };
+    table[OpcodeKind::AND_B] = Opcode { "AND B", 1, 1, and_b };
+    table[OpcodeKind::AND_C] = Opcode { "AND C", 1, 1, and_c };
+    table[OpcodeKind::AND_D] = Opcode { "AND D", 1, 1, and_d };
+    table[OpcodeKind::AND_E] = Opcode { "AND E", 1, 1, and_e };
+    table[OpcodeKind::AND_H] = Opcode { "AND H", 1, 1, and_h };
+    table[OpcodeKind::AND_L] = Opcode { "AND L", 1, 1, and_l };
+    table[OpcodeKind::AND_A] = Opcode { "AND A", 1, 1, and_a };
+    table[OpcodeKind::AND_HL] = Opcode { "AND (HL)", 1, 2, and_hl };
+    table[OpcodeKind::AND_N] = Opcode { "XOR n", 2, 2, xor_n };
+    table[OpcodeKind::XOR_B] = Opcode { "XOR B", 1, 1, xor_b };
+    table[OpcodeKind::XOR_C] = Opcode { "XOR C", 1, 1, xor_c };
+    table[OpcodeKind::XOR_D] = Opcode { "XOR D", 1, 1, xor_d };
+    table[OpcodeKind::XOR_E] = Opcode { "XOR E", 1, 1, xor_e };
+    table[OpcodeKind::XOR_H] = Opcode { "XOR H", 1, 1, xor_h };
+    table[OpcodeKind::XOR_L] = Opcode { "XOR L", 1, 1, xor_l };
+    table[OpcodeKind::XOR_A] = Opcode { "XOR A", 1, 1, xor_a };
+    table[OpcodeKind::XOR_HL] = Opcode { "XOR (HL)", 1, 2, xor_hl };
+    table[OpcodeKind::XOR_N] = Opcode { "XOR n", 2, 2, xor_n };
+    table[OpcodeKind::OR_B] = Opcode { "OR B", 1, 1, or_b };
+    table[OpcodeKind::OR_C] = Opcode { "OR C", 1, 1, or_c };
+    table[OpcodeKind::OR_D] = Opcode { "OR D", 1, 1, or_d };
+    table[OpcodeKind::OR_E] = Opcode { "OR E", 1, 1, or_e };
+    table[OpcodeKind::OR_H] = Opcode { "OR H", 1, 1, or_h };
+    table[OpcodeKind::OR_L] = Opcode { "OR L", 1, 1, or_l };
+    table[OpcodeKind::OR_A] = Opcode { "OR A", 1, 1, or_a };
+    table[OpcodeKind::OR_HL] = Opcode { "OR (HL)", 1, 2, or_hl };
+    table[OpcodeKind::OR_N] = Opcode { "OR n", 2, 2, or_n };
     return table;
 }
 constexpr std::array<Opcode, 256> opcode_jump_table = new_opcode_jump_table();
